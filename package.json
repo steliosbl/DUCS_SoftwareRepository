@@ -4,7 +4,7 @@
   "description": "DU Computer Science Programming-Y1 Summative 2",
   "main": "server.js",
   "scripts": {
-    "dev":"npm run server & npm run client",
+    "dev": "npm run server & npm run client",
     "client": "browser-sync start --proxy=localhost:8000 --files='public' --ignore=node_modules --reload-delay 10 --no-ui --no-notify",
     "server": "nodemon ./server.js",
     "pretest": "eslint --fix *.js",
@@ -23,6 +23,7 @@
     "nodemon": "^2.0.2"
   },
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "lowdb": "^1.0.0"
   }
 }
