@@ -4,13 +4,16 @@
   "description": "DU Computer Science Programming-Y1 Summative 2",
   "main": "server.js",
   "scripts": {
-    "dev": "nodemon ./server.js",
+    "dev":"npm run server & npm run client",
+    "client": "browser-sync start --proxy=localhost:8000 --files='public' --ignore=node_modules --reload-delay 10 --no-ui --no-notify",
+    "server": "nodemon ./server.js",
     "pretest": "eslint --fix *.js",
     "test": "jest"
   },
   "author": "kqcr86",
   "license": "ISC",
   "devDependencies": {
+    "browser-sync": "^2.26.7",
     "eslint": "^6.8.0",
     "eslint-config-standard": "^14.1.1",
     "eslint-plugin-import": "^2.20.2",
