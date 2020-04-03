@@ -1,0 +1,11 @@
+{
+  "name": "web_0013",
+  "version": "1.0.0",
+  "description": "DU Computer Science Programming-Y1 Summative 2",
+  "main": "server.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "kqcr86",
+  "license": "ISC"
+}
