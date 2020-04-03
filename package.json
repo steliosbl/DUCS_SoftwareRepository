@@ -4,8 +4,15 @@
   "description": "DU Computer Science Programming-Y1 Summative 2",
   "main": "server.js",
   "scripts": {
-    "test": "test"
+    "dev": "nodemon ./server.js",
+    "test": "jest"
   },
   "author": "kqcr86",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
