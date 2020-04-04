@@ -11,9 +11,7 @@ imageRouter.use(fileUpload({
     }
 }));
 
-imageRouter.use(express.static(path.join(__dirname, '../.data/static/images')));
-
-imageRouter.use('/thumbnails', express.static(path.join(__dirname, '../.data/static/thumbnails')));
+imageRouter.use(express.static(path.join(__dirname, '../.data/static')));
 
 imageRouter.post('/upload', (req, res) => {
     if (req.files && Object.keys(req.files).length !== 0 && req.files.image) {
@@ -22,11 +20,11 @@ imageRouter.post('/upload', (req, res) => {
                 req.files.image.mv(path.join(__dirname, '../.data/static/images/', req.body.id + '.png'));
                 return res.status(200).json();
             }
-            return res.invalid('File too large, limit is 1MB');
+            return res.respond.invalid('File too large, limit is 1MB');
         }
-        return res.invalid('Invalid file type, must be image/png');
+        return res.respond.invalid('Invalid file type, must be image/png');
       }
-      return res.invalid('No files were uploaded');
+      return res.respond.invalid('No files were uploaded');
 });
 
 imageRouter.get('*', (req, res) => {

@@ -8,7 +8,7 @@ programRouter.get('/', (req, res) => {
         .get('programs')
         .value();
 
-    res.status(200).json(all);
+    return res.status(200).json(all);
 });
 
 programRouter.post('/', (req, res) => {
@@ -23,7 +23,7 @@ programRouter.post('/', (req, res) => {
         .push(newProgram)
         .write();
 
-    res.status(200).json(newProgram);
+    return res.status(200).json(newProgram);
 });
 
 programRouter.all('/:id', (req, res, next) => {
@@ -37,15 +37,15 @@ programRouter.all('/:id', (req, res, next) => {
         if (res.program) {
             next();
         } else {
-            res.notfound();
+            return res.respond.notfound();
         }
-    } else {
-        res.invalid();
     }
+
+    return res.respond.invalid('Invalid program id');
 });
 
 programRouter.get('/:id', (req, res) => {
-    res.status(200).json(res.program.value());
+    return res.status(200).json(res.program.value());
 });
 
 programRouter.put('/:id', (req, res) => {
@@ -53,13 +53,17 @@ programRouter.put('/:id', (req, res) => {
         .every(key => key in res.program.value());
 
     if (validRequest) {
-        res.program.assign(req.body)
+        if (req.body.author === res.program.author) {
+            res.program.assign(req.body)
             .write();
 
-        res.status(200).json(res.program.value());
-    } else {
-        res.invalid();
+            return res.status(200).json(res.program.value());
+        }
+        
+        return res.status()
     }
+
+    return res.respond.invalid('Invalid request body');
 });
 
 programRouter.delete('/:id', (req, res) => {
@@ -70,7 +74,7 @@ programRouter.delete('/:id', (req, res) => {
         })
         .write();
 
-    res.status(200).json(resp);
+    return res.status(200).json(resp);
 });
 
 module.exports = programRouter;

@@ -2,6 +2,8 @@
 const express = require('express');
 const path = require('path');
 
+const errors = require('./errors');
+
 const programRouter = require('./routes/program');
 const imageRouter = require('./routes/image');
 
@@ -18,21 +20,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
 // Common responses
-app.use((req, res, next) => {
-  res.notfound = () => {
-    res.status(404).json({
-      error: '404'
-    });
-  };
-
-  res.invalid = (err = '400') => {
-    res.status(404).json({
-        error: err
-      });
-  };
-
-  next();
-});
+app.use(errors);
 
 app.use('/program', programRouter);
 app.use('/image', imageRouter);
@@ -42,7 +30,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('*', (req, res) => {
-  res.notfound();
+  res.respond.notfound();
 });
 
 module.exports = app;
