@@ -2,8 +2,8 @@
 const express = require('express');
 const path = require('path');
 
-const programsRouter = require('./routes/programs');
-const imagesRouter = require('./routes/images');
+const programRouter = require('./routes/program');
+const imageRouter = require('./routes/image');
 
 const morgan = require('morgan');
 
@@ -13,7 +13,7 @@ const app = express();
 // Initialize logging
 app.use(morgan('tiny'));
 
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, 'public')));
 // Set JSON encoding
 app.use(express.json());
 
@@ -34,8 +34,8 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/programs', programsRouter);
-app.use('/images', imagesRouter);
+app.use('/program', programRouter);
+app.use('/image', imageRouter);
 
 app.get('/', (req, res) => {
   res.status(200).sendFile('index.html', { root: path.join(__dirname, 'views') });

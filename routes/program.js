@@ -1,9 +1,9 @@
 const express = require('express');
 const shortid = require('shortid');
 
-const programsRouter = express.Router();
+const programRouter = express.Router();
 
-programsRouter.get('/', (req, res) => {
+programRouter.get('/', (req, res) => {
     const all = req.app.db
         .get('programs')
         .value();
@@ -11,7 +11,7 @@ programsRouter.get('/', (req, res) => {
     res.status(200).json(all);
 });
 
-programsRouter.post('/', (req, res) => {
+programRouter.post('/', (req, res) => {
     const newProgram = {
         id: shortid.generate(),
         date: new Date(Date.now()).toISOString(),
@@ -26,7 +26,7 @@ programsRouter.post('/', (req, res) => {
     res.status(200).json(newProgram);
 });
 
-programsRouter.all('/:id', (req, res, next) => {
+programRouter.all('/:id', (req, res, next) => {
     if (shortid.isValid(req.params.id)) {
         res.program = req.app.db
             .get('programs')
@@ -44,11 +44,11 @@ programsRouter.all('/:id', (req, res, next) => {
     }
 });
 
-programsRouter.get('/:id', (req, res) => {
+programRouter.get('/:id', (req, res) => {
     res.status(200).json(res.program.value());
 });
 
-programsRouter.put('/:id', (req, res) => {
+programRouter.put('/:id', (req, res) => {
     var validRequest = Object.keys(req.body)
         .every(key => key in res.program.value());
 
@@ -62,7 +62,7 @@ programsRouter.put('/:id', (req, res) => {
     }
 });
 
-programsRouter.delete('/:id', (req, res) => {
+programRouter.delete('/:id', (req, res) => {
     const resp = req.app.db
         .get('programs')
         .remove({
@@ -73,4 +73,4 @@ programsRouter.delete('/:id', (req, res) => {
     res.status(200).json(resp);
 });
 
-module.exports = programsRouter;
+module.exports = programRouter;

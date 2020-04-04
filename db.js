@@ -1,7 +1,7 @@
 // Dependencies
 const lowdb = require('lowdb');
 const FileAsync = require('lowdb/adapters/FileAsync');
-const Memory = require('lowdb/adapters/Memory')
+const Memory = require('lowdb/adapters/Memory');
 
 // This object contains the 'connect()' function which initializes the database and passes it to the app
 // The NODE_ENV variable is used to determine if this is a testing or production environment
@@ -16,6 +16,6 @@ const db = {
                 : new FileAsync('.data/db.json')
         );
     }
-}
+};
 
 module.exports = db;
