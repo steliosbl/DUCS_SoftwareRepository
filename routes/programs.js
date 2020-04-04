@@ -1,14 +1,6 @@
 const express = require('express');
 const shortid = require('shortid');
 
-// Constants used for responses
-const NOTFOUND = {
-    error: '404'
-};
-const INVALID = {
-    error: '400'
-};
-
 const programsRouter = express.Router();
 
 programsRouter.get('/', (req, res) => {
@@ -45,10 +37,10 @@ programsRouter.all('/:id', (req, res, next) => {
         if (res.program) {
             next();
         } else {
-            res.status(404).json(NOTFOUND);
+            res.notfound();
         }
     } else {
-        res.status(400).json(INVALID);
+        res.invalid();
     }
 });
 
@@ -66,7 +58,7 @@ programsRouter.put('/:id', (req, res) => {
 
         res.status(200).json(res.program.value());
     } else {
-        res.status(400).json(INVALID);
+        res.invalid();
     }
 });
 

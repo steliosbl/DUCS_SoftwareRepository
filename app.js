@@ -4,14 +4,6 @@ const path = require('path');
 
 const programRouter = require('./routes/programs');
 
-// Constants used for responses
-const NOTFOUND = {
-  error: '404'
-};
-// const INVALID = {
-//   error: '400'
-// };
-
 const morgan = require('morgan');
 
 // Initialize app
@@ -24,6 +16,23 @@ app.use(morgan('tiny'));
 // Set JSON encoding
 app.use(express.json());
 
+// Common responses
+app.use((req, res, next) => {
+  res.notfound = () => {
+    res.status(404).json({
+      error: '404'
+    });
+  };
+
+  res.invalid = () => {
+    res.status(404).json({
+        error: '400'
+      });
+  };
+
+  next();
+});
+
 app.use('/programs', programRouter);
 
 app.get('/', (req, res) => {
@@ -31,7 +40,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('*', (req, res) => {
-  res.status(404).json(NOTFOUND);
+  res.notfound();
 });
 
 module.exports = app;
