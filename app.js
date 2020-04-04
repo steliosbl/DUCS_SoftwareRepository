@@ -8,9 +8,9 @@ const programRouter = require('./routes/programs');
 const NOTFOUND = {
   error: '404'
 };
-const INVALID = {
-  error: '400'
-};
+// const INVALID = {
+//   error: '400'
+// };
 
 const morgan = require('morgan');
 
@@ -27,7 +27,7 @@ app.use(express.json());
 app.use('/programs', programRouter);
 
 app.get('/', (req, res) => {
-  res.status(200).sendFile('index.html', { root: path.join(__dirname, 'public') });
+  res.status(200).sendFile('index.html', { root: path.join(__dirname, 'views') });
 });
 
 app.get('*', (req, res) => {

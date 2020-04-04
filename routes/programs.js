@@ -12,11 +12,11 @@ const INVALID = {
 const programsRouter = express.Router();
 
 programsRouter.get('/', (req, res) => {
-    const all = req.app.get('db')
+    const all = req.app.db
         .get('programs')
         .value();
 
-    res.status(200).send(all);
+    res.status(200).json(all);
 });
 
 programsRouter.post('/', (req, res) => {
@@ -26,17 +26,17 @@ programsRouter.post('/', (req, res) => {
         ...req.body
     };
 
-    req.app.get('db')
+    req.app.db
         .get('programs')
         .push(newProgram)
         .write();
 
-    res.status(200).send(newProgram);
+    res.status(200).json(newProgram);
 });
 
 programsRouter.all('/:id', (req, res, next) => {
     if (shortid.isValid(req.params.id)) {
-        res.program = req.app.get('db')
+        res.program = req.app.db
             .get('programs')
             .find({
                 id: req.params.id
@@ -53,7 +53,7 @@ programsRouter.all('/:id', (req, res, next) => {
 });
 
 programsRouter.get('/:id', (req, res) => {
-    res.status(200).send(res.program.value());
+    res.status(200).json(res.program.value());
 });
 
 programsRouter.put('/:id', (req, res) => {
@@ -64,21 +64,21 @@ programsRouter.put('/:id', (req, res) => {
         res.program.assign(req.body)
             .write();
 
-        res.status(200).send(res.program.value());
+        res.status(200).json(res.program.value());
     } else {
-        res.status(400).send(INVALID);
+        res.status(400).json(INVALID);
     }
 });
 
 programsRouter.delete('/:id', (req, res) => {
-    const resp = req.app.get('db')
+    const resp = req.app.db
         .get('programs')
         .remove({
             id: req.params.id
         })
         .write();
 
-    res.status(200).send(resp);
+    res.status(200).json(resp);
 });
 
 module.exports = programsRouter;
