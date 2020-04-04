@@ -5,12 +5,8 @@ const app = require('./app');
 const port = process.env.PORT || '8000';
 
 // Database dependencies
-const bodyParser = require('body-parser');
 const lowdb = require('lowdb');
 const FileAsync = require('lowdb/adapters/FileAsync');
-
-// Set JSON encoding
-app.use(bodyParser.json());
 
 // Initialize database, pass it to request context, then launch app
 const adapter = new FileAsync('.data/db.json');
