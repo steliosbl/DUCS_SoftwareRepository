@@ -2,7 +2,8 @@
 const express = require('express');
 const path = require('path');
 
-const errors = require('./errors');
+const errors = require('./middleware/errors');
+const jsonErrorHandler = require('./middleware/jsonErrorHandler');
 
 const programRouter = require('./routes/program');
 const imageRouter = require('./routes/image');
@@ -34,5 +35,6 @@ app.get('/', (req, res) => {
 app.get('*', (req, res) => {
   res.respond.notfound();
 });
+
 
 module.exports = app;
