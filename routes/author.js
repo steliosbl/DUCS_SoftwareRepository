@@ -1,4 +1,5 @@
 const express = require('express');
+const authorSchema = require('../models/author');
 
 const authorRouter = express.Router();
 
@@ -11,7 +12,7 @@ function getAuthor (db, id) {
 }
 
 authorRouter.post('/', (req, res) => {
-    if (!getAuthor(req.db, req.body.id)) {
+    if (!getAuthor(req.app.db, req.body.id).value()) {
         const newAuthor = {
             id: req.body.id,
             email: req.body.email,
@@ -30,7 +31,7 @@ authorRouter.post('/', (req, res) => {
 });
 
 authorRouter.all('/:id', (req, res, next) => {
-    res.author = getAuthor(req.db, req.params.id);
+    res.author = getAuthor(req.app.db, req.params.id);
     if (res.author) {
         next();
     } else {
@@ -59,3 +60,5 @@ authorRouter.put('/:id', (req, res) => {
 authorRouter.delete('/:id', (req, res) => {
     return res.respond.forbidden('They will never be forgotten');
 });
+
+module.exports = authorRouter;

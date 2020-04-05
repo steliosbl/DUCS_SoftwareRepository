@@ -59,8 +59,8 @@ programRouter.put('/:id', (req, res) => {
 
             return res.status(200).json(res.program.value());
         }
-        
-        return res.status()
+
+        return res.status();
     }
 
     return res.respond.invalid('Invalid request body');

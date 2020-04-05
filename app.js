@@ -6,6 +6,7 @@ const errors = require('./errors');
 
 const programRouter = require('./routes/program');
 const imageRouter = require('./routes/image');
+const authorRouter = require('./routes/author');
 
 const morgan = require('morgan');
 
@@ -24,6 +25,7 @@ app.use(errors);
 
 app.use('/program', programRouter);
 app.use('/image', imageRouter);
+app.use('/author', authorRouter);
 
 app.get('/', (req, res) => {
   res.status(200).sendFile('index.html', { root: path.join(__dirname, 'views') });
