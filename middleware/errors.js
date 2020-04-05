@@ -3,7 +3,7 @@ module.exports = (req, res, next) => {
         msg = msg || code.toString();
 
         res.status(code).json({
-            error: msg
+            errors: msg
         });
     }
 
@@ -22,6 +22,10 @@ module.exports = (req, res, next) => {
 
         conflict: (msg) => {
             errorResp(409, msg);
+        },
+
+        unprocessable: (msg) => {
+            errorResp(422, msg);
         },
 
         other: (code, msg) => errorResp(code, msg)
