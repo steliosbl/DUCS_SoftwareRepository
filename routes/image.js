@@ -24,7 +24,7 @@ imageRouter.post('/upload', (req, res) => {
         }
         return res.respond.invalid('Invalid file type, must be image/png');
       }
-      return res.respond.invalid('No files were uploaded');
+      return res.respond.unprocessable('No files were uploaded');
 });
 
 imageRouter.get('*', (req, res) => {

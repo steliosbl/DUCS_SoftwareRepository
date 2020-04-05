@@ -10,18 +10,28 @@ const {
 const authorRouter = express.Router();
 
 authorRouter.post('/', checkSchema(authorSchema.POST), validate, (req, res) => {
-    const newAuthor = {
-        id: req.body.id,
-        email: req.body.email,
-        registrationDate: new Date(Date.now()).toISOString()
-    };
+    const idAvailable = !req.app.db
+                .get('authors')
+                .find({
+                    id: req.body.id
+                }).value();
 
-    req.app.db
-        .get('authors')
-        .push(newAuthor)
-        .write();
+    if (idAvailable) {
+        const newAuthor = {
+            id: req.body.id,
+            email: req.body.email,
+            registrationDate: new Date(Date.now()).toISOString()
+        };
 
-    return res.status(200).json(newAuthor);
+        req.app.db
+            .get('authors')
+            .push(newAuthor)
+            .write();
+
+        return res.status(200).json(newAuthor);
+    }
+
+    return res.respond.conflict('Id already in use');
 });
 
 authorRouter.all('/:id', (req, res, next) => {
@@ -51,7 +61,7 @@ authorRouter.put('/:id', checkSchema(authorSchema.PUT), validate, (req, res) => 
         return res.status(200).json(res.author.value());
     }
 
-    return res.respond.invalid('Invalid keys in request body');
+    return res.respond.unprocessable('Invalid keys in request body');
 });
 
 authorRouter.delete('/:id', (req, res) => {

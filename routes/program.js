@@ -67,7 +67,7 @@ programRouter.put('/:id', checkSchema(programSchema.PUT), validate, (req, res) =
         return res.respond.forbidden('User does not own program');
     }
 
-    return res.respond.invalid('Invalid keys in request body');
+    return res.respond.unprocessable('Invalid keys in request body');
 });
 
 programRouter.delete('/:id', (req, res) => {
