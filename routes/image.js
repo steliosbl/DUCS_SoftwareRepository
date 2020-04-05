@@ -20,7 +20,7 @@ imageRouter.post('/upload', (req, res) => {
                 req.files.image.mv(path.join(__dirname, '../.data/static/images/', req.body.id + '.png'));
                 return res.status(200).json();
             }
-            return res.respond.invalid('File too large, limit is 1MB');
+            return res.respond.tooLarge('File too large, limit is 1MB');
         }
         return res.respond.invalid('Invalid file type, must be image/png');
       }

@@ -28,6 +28,10 @@ module.exports = (req, res, next) => {
             errorResp(422, msg);
         },
 
+        tooLarge: (msg) => {
+            errorResp(413, msg);
+        },
+
         other: (code, msg) => errorResp(code, msg)
     };
 
