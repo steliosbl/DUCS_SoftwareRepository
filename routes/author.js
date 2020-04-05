@@ -1,5 +1,7 @@
 const express = require('express');
-const authorSchema = require('../models/author');
+const {
+    authorSchema
+} = require('../models/author');
 const validate = require('../middleware/validate');
 const {
     checkSchema
@@ -7,35 +9,26 @@ const {
 
 const authorRouter = express.Router();
 
-function getAuthor (db, id) {
-    return db
-        .get('authors')
-        .find({
-            id: id
-        });
-}
-
 authorRouter.post('/', checkSchema(authorSchema.POST), validate, (req, res) => {
-    if (!getAuthor(req.app.db, req.body.id).value()) {
-        const newAuthor = {
-            id: req.body.id,
-            email: req.body.email,
-            registrationDate: new Date(Date.now()).toISOString()
-        };
+    const newAuthor = {
+        id: req.body.id,
+        email: req.body.email,
+        registrationDate: new Date(Date.now()).toISOString()
+    };
 
-        req.app.db
-            .get('authors')
-            .push(newAuthor)
-            .write();
+    req.app.db
+        .get('authors')
+        .push(newAuthor)
+        .write();
 
-        return res.status(200).json(newAuthor);
-    }
-
-    return res.respond.conflict('Id already in use');
+    return res.status(200).json(newAuthor);
 });
 
 authorRouter.all('/:id', (req, res, next) => {
-    res.author = getAuthor(req.app.db, req.params.id);
+    res.author = req.app.db.get('authors')
+        .find({
+            id: req.params.id
+        });
     if (res.author) {
         next();
     } else {
@@ -58,7 +51,7 @@ authorRouter.put('/:id', checkSchema(authorSchema.PUT), validate, (req, res) => 
         return res.status(200).json(res.author.value());
     }
 
-    return res.respond.invalid('Invalid request body');
+    return res.respond.invalid('Invalid keys in request body');
 });
 
 authorRouter.delete('/:id', (req, res) => {

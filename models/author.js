@@ -3,7 +3,19 @@ const author = {
         in: ['body'],
         isAlphanumeric: true,
         escape: true,
-        trim: true
+        trim: true,
+        custom: {
+            errorMessage: 'Id already in use',
+            options: (value, {
+                req
+            }) => {
+                return !req.app.db
+                    .get('authors')
+                    .find({
+                        id: value
+                    }).value();
+            }
+        }
     },
     email: {
         in: ['body'],
@@ -37,4 +49,7 @@ const authorSchema = {
     }
 };
 
-module.exports = authorSchema;
+module.exports = {
+    author: author,
+    authorSchema: authorSchema
+};

@@ -36,5 +36,6 @@ app.get('*', (req, res) => {
   res.respond.notfound();
 });
 
+app.use(jsonErrorHandler);
 
 module.exports = app;
