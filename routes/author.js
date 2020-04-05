@@ -1,5 +1,9 @@
 const express = require('express');
 const authorSchema = require('../models/author');
+const validate = require('../middleware/validate');
+const {
+    checkSchema
+} = require('express-validator');
 
 const authorRouter = express.Router();
 
@@ -11,7 +15,7 @@ function getAuthor (db, id) {
         });
 }
 
-authorRouter.post('/', (req, res) => {
+authorRouter.post('/', checkSchema(authorSchema.POST), validate, (req, res) => {
     if (!getAuthor(req.app.db, req.body.id).value()) {
         const newAuthor = {
             id: req.body.id,
@@ -43,7 +47,7 @@ authorRouter.get('/:id', (req, res) => {
     return res.status(200).json(res.author.value());
 });
 
-authorRouter.put('/:id', (req, res) => {
+authorRouter.put('/:id', checkSchema(authorSchema.PUT), validate, (req, res) => {
     var validRequest = Object.keys(req.body)
         .every(key => key in res.author.value());
 
