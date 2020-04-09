@@ -27,7 +27,7 @@ authorRouter.post('/', checkSchema(authorSchema.POST), validate, (req, res) => {
             .push(newAuthor)
             .write();
 
-        return res.status(200).json(newAuthor);
+        return res.status(201).json(newAuthor);
     }
 
     return res.respond.conflict('Id already in use');

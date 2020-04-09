@@ -55,11 +55,11 @@ describe('Test authorRouter', () => {
         })
     });
 
-    it('Responds to POST with 200-Ok and the right data if everything is correct', async () => {
+    it('Responds to POST with 201-Created and the right data if everything is correct', async () => {
         const id = 'test';
         const email = 'test@example.com'
         const res = await commonRequests.createAuthor(id, email)
-            .expect(200);
+            .expect(201);
 
         expect(res.body.id).toBe(id);
         expect(res.body.email).toBe(email);
@@ -70,7 +70,7 @@ describe('Test authorRouter', () => {
         const id = 'usedId';
 
         await commonRequests.createAuthor(id, "foo@example.com")
-            .expect(200);
+            .expect(201);
 
         await commonRequests.createAuthor(id, "bar@example.com")
             .expect(409);
@@ -79,7 +79,7 @@ describe('Test authorRouter', () => {
     it('Responds to POST with 409-Conflict if an author with the given email has already registered', async () => {
         const email = 'taken@example.com';
         await commonRequests.createAuthor('foo', email)
-            .expect(200);
+            .expect(201);
 
         await commonRequests.createAuthor('bar', email)
             .expect(409);
@@ -98,7 +98,7 @@ describe('Test authorRouter', () => {
     it('Responds to GET with 200-Ok and the correct data if given an Id that corresponds to a data item', async () => {
         id = 'test';
         await commonRequests.createAuthor(id)
-            .expect(200);
+            .expect(201);
 
         const get = await request.get('/author/' + id)
             .expect(200);

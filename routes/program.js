@@ -27,7 +27,7 @@ programRouter.post('/', checkSchema(programSchema.POST), validate, (req, res) =>
         .push(newProgram)
         .write();
 
-    return res.status(200).json(newProgram);
+    return res.status(201).json(newProgram);
 });
 
 programRouter.all('/:id', (req, res, next) => {
