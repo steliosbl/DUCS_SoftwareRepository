@@ -13,16 +13,16 @@ describe('Test authorRouter', () => {
     });
 
     it('Responds to POST with content-type JSON', async () => {
-        request.post('/author')
+        return await request.post('/author')
             .expect('Content-Type', /json/);
     });
 
-    it('Responds with error 422-Unprocessable Entity if request has empty body', async () => {
-        await request.post('/author')
+    it('Responds to POST with error 422-Unprocessable Entity if request has empty body', async () => {
+        return await request.post('/author')
             .expect(422)
     });
 
-    it('Responds with error 422-Unprocessable Entity if a field in the request body is missing, empty or contains invalid data', async () => {
+    it('Responds to POST with error 422-Unprocessable Entity if a field in the request body is missing, empty or contains invalid data', async () => {
         const bodies = [{
                 email: 'test@example.com'
             },
@@ -47,7 +47,7 @@ describe('Test authorRouter', () => {
             }
         ]
 
-        await bodies.map(async body => {
+        return await bodies.map(async body => {
             await request.post('/author')
                 .send(body)
                 .expect('Content-Type', /json/)
@@ -72,7 +72,7 @@ describe('Test authorRouter', () => {
         await commonRequests.createAuthor(id, "foo@example.com")
             .expect(201);
 
-        await commonRequests.createAuthor(id, "bar@example.com")
+        return await commonRequests.createAuthor(id, "bar@example.com")
             .expect(409);
     });
 
@@ -81,17 +81,17 @@ describe('Test authorRouter', () => {
         await commonRequests.createAuthor('foo', email)
             .expect(201);
 
-        await commonRequests.createAuthor('bar', email)
+        return await commonRequests.createAuthor('bar', email)
             .expect(409);
     });
 
     it('Responds to GET with 404-Not Found if not given an Id', async () => {
-        await request.get('/author')
+        return await request.get('/author')
             .expect(404);
     });
 
     it('Responds to GET with 404-Not Found if given an Id that doesnt exist', async () => {
-        await request.get('/author/fake_id')
+        return await request.get('/author/fake_id')
             .expect(404);
     });
 
