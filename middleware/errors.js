@@ -32,6 +32,10 @@ module.exports = (req, res, next) => {
             errorResp(413, msg);
         },
 
+        failedDependency: (msg) => {
+            errorResp(424, msg);
+        },
+
         other: (code, msg) => errorResp(code, msg)
     };
 

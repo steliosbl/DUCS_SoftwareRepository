@@ -16,18 +16,29 @@ programRouter.get('/', (req, res) => {
 });
 
 programRouter.post('/', checkSchema(programSchema.POST), validate, (req, res) => {
-    const newProgram = {
-        id: shortid.generate(),
-        date: new Date(Date.now()).toISOString(),
-        ...req.body
-    };
+    const authorExists = Boolean(req.app.db
+        .get('authors')
+        .find({
+            id: req.body.author
+        })
+        .value());
 
-    req.app.db
-        .get('programs')
-        .push(newProgram)
-        .write();
+    if (authorExists) {
+        const newProgram = {
+            id: shortid.generate(),
+            date: new Date(Date.now()).toISOString(),
+            ...req.body
+        };
 
-    return res.status(201).json(newProgram);
+        req.app.db
+            .get('programs')
+            .push(newProgram)
+            .write();
+
+        return res.status(201).json(newProgram);
+    }
+
+    return res.respond.failedDependency();
 });
 
 programRouter.all('/:id', (req, res, next) => {
@@ -38,14 +49,17 @@ programRouter.all('/:id', (req, res, next) => {
                 id: req.params.id
             });
 
-        if (res.program) {
+        if (res.program.value()) {
             next();
         } else {
             return res.respond.notfound();
         }
     }
+    else {
+        return res.respond.unprocessable('Invalid program id');
+    }
 
-    return res.respond.invalid('Invalid program id');
+
 });
 
 programRouter.get('/:id', (req, res) => {
