@@ -15,6 +15,11 @@ const db = {
                 ? new Memory()
                 : new FileAsync('.data/db.json')
         );
+
+        app.db.defaults({
+            authors: [],
+            programs: []
+        }).write();
     }
 };
 

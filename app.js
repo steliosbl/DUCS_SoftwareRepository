@@ -15,7 +15,7 @@ const morgan = require('morgan');
 const app = express();
 
 // Initialize logging
-app.use(morgan('tiny'));
+app.use(morgan('dev'));
 
 app.use(express.static(path.join(__dirname, 'public')));
 // Set JSON encoding

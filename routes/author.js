@@ -12,9 +12,8 @@ const authorRouter = express.Router();
 authorRouter.post('/', checkSchema(authorSchema.POST), validate, (req, res) => {
     const idAvailable = !req.app.db
                 .get('authors')
-                .find({
-                    id: req.body.id
-                }).value();
+                .find(item => item.id === req.body.id || item.email === req.body.email)
+                .value();
 
     if (idAvailable) {
         const newAuthor = {
@@ -39,7 +38,7 @@ authorRouter.all('/:id', (req, res, next) => {
         .find({
             id: req.params.id
         });
-    if (res.author) {
+    if (res.author.value()) {
         next();
     } else {
         return res.respond.notfound();
