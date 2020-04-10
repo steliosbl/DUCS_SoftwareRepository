@@ -6,7 +6,21 @@ const validate = require('../middleware/validate');
 
 const programRouter = express.Router();
 
-programRouter.get('/', (req, res) => {
+programRouter.get('/', validateProgram.GET, validate, (req, res) => {
+    if (req.query.id) {
+        res.program = req.app.db
+            .get('programs')
+            .find({
+                id: req.query.id
+            });
+
+        if (res.program.value()) {
+            return res.status(200).json(res.program.value());
+        }
+
+        return res.respond.notfound();
+    }
+
     const all = req.app.db
         .get('programs')
         .value();
@@ -54,8 +68,7 @@ programRouter.all('/:id', (req, res, next) => {
         } else {
             return res.respond.notfound();
         }
-    }
-    else {
+    } else {
         return res.respond.unprocessable('Invalid program id');
     }
 });

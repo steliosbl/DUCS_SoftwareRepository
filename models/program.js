@@ -3,14 +3,12 @@ const author = require('./author');
 
 module.exports = {
     id: {
-        in: ['body', 'param'],
+        in: ['body', 'param', 'query'],
         isAlphanumeric: true,
         escape: true,
         trim: true,
         custom: {
-            options: (value) => {
-                return shortid.isValid(value)
-            }
+            options: value => shortid.isValid(value)
         }
     },
     authorId: {

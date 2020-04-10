@@ -4,7 +4,7 @@ const { checkSchema } = require('express-validator');
 module.exports = {
     GET: checkSchema({
         id: {
-            exists: true,
+            optional: true,
             ...schema.id
         }
     }),
