@@ -1,9 +1,8 @@
 const express = require('express');
 const shortid = require('shortid');
 
-const programSchema = require('../models/program');
+const validateProgram = require('../models/requests/program');
 const validate = require('../middleware/validate');
-const { checkSchema } = require('express-validator');
 
 const programRouter = express.Router();
 
@@ -15,11 +14,11 @@ programRouter.get('/', (req, res) => {
     return res.status(200).json(all);
 });
 
-programRouter.post('/', checkSchema(programSchema.POST), validate, (req, res) => {
+programRouter.post('/', validateProgram.POST, validate, (req, res) => {
     const authorExists = Boolean(req.app.db
         .get('authors')
         .find({
-            id: req.body.author
+            id: req.body.authorId
         })
         .value());
 
@@ -27,7 +26,8 @@ programRouter.post('/', checkSchema(programSchema.POST), validate, (req, res) =>
         const newProgram = {
             id: shortid.generate(),
             date: new Date(Date.now()).toISOString(),
-            ...req.body
+            authorId: req.body.sessionId,
+            description: req.body.description
         };
 
         req.app.db
@@ -58,20 +58,18 @@ programRouter.all('/:id', (req, res, next) => {
     else {
         return res.respond.unprocessable('Invalid program id');
     }
-
-
 });
 
 programRouter.get('/:id', (req, res) => {
     return res.status(200).json(res.program.value());
 });
 
-programRouter.put('/:id', checkSchema(programSchema.PUT), validate, (req, res) => {
+programRouter.put('/:id', validateProgram.PUT, validate, (req, res) => {
     var validRequest = Object.keys(req.body)
-        .every(key => key in res.author.value());
+        .every(key => key in res.program.value());
 
     if (validRequest) {
-        if (req.body.author === res.program.author) {
+        if (req.body.sessionId === res.program.authorId) {
             res.program.assign(req.body)
                 .write();
 
@@ -85,7 +83,7 @@ programRouter.put('/:id', checkSchema(programSchema.PUT), validate, (req, res) =
 });
 
 programRouter.delete('/:id', (req, res) => {
-    if (req.body.author === res.program.author) {
+    if (req.body.sessionId === res.program.authorId) {
         const resp = req.app.db
         .get('programs')
         .remove({

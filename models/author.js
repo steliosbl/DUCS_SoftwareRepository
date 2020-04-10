@@ -1,43 +1,16 @@
-const author = {
+module.exports = {
     id: {
-        in: ['body'],
-        isAlphanumeric: true,
-        escape: true,
-        trim: true
-    },
-    email: {
         in: ['body'],
         isEmail: true,
         escape: true,
         trim: true,
         normalizeEmail: true
-    }
-};
-
-const authorSchema = {
-    POST: {
-        id: {
-            exists: true,
-            ...author.id
-        },
-        email: {
-            exists: true,
-            ...author.email
-        }
     },
-    PUT: {
-        id: {
-            optional: true,
-            ...author.id
-        },
-        email: {
-            optional: true,
-            ...author.email
-        }
-    }
-};
 
-module.exports = {
-    author: author,
-    authorSchema: authorSchema
+    name: {
+        in: ['body'],
+        matches: /^[a-z ]+$/i, // Only characters allowed are a-z (case insensitive) and spaces
+        escape: true,
+        trim: true
+    }
 };

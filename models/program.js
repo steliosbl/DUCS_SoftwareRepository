@@ -1,11 +1,9 @@
 const shortid = require('shortid');
-const {
-    author
-} = require('./author');
+const author = require('./author');
 
-const program = {
+module.exports = {
     id: {
-        in: ['body'],
+        in: ['body', 'param'],
         isAlphanumeric: true,
         escape: true,
         trim: true,
@@ -15,7 +13,8 @@ const program = {
             }
         }
     },
-    author: {
+    authorId: {
+        in: ['body', 'param'],
         ...author.id
     },
     description: {
@@ -24,32 +23,3 @@ const program = {
         trim: true
     }
 };
-
-const programSchema = {
-    POST: {
-        author: {
-            exists: true,
-            ...program.author
-        },
-        description: {
-            exists: true,
-            ...program.description
-        }
-    },
-    PUT: {
-        id: {
-            optional: true,
-            ...program.id
-        },
-        author: {
-            optional: true,
-            ...program.author
-        },
-        description: {
-            optional: true,
-            ...program.description
-        }
-    }
-};
-
-module.exports = programSchema;

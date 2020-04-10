@@ -1,24 +1,19 @@
 const express = require('express');
-const {
-    authorSchema
-} = require('../models/author');
+const validateAuthor = require('../models/requests/author');
 const validate = require('../middleware/validate');
-const {
-    checkSchema
-} = require('express-validator');
 
 const authorRouter = express.Router();
 
-authorRouter.post('/', checkSchema(authorSchema.POST), validate, (req, res) => {
+authorRouter.post('/', validateAuthor.POST, validate, (req, res) => {
     const idAvailable = !req.app.db
                 .get('authors')
-                .find(item => item.id === req.body.id || item.email === req.body.email)
+                .find(item => item.id === req.body.id)
                 .value();
 
     if (idAvailable) {
         const newAuthor = {
             id: req.body.id,
-            email: req.body.email,
+            name: req.body.name,
             registrationDate: new Date(Date.now()).toISOString()
         };
 
@@ -49,7 +44,7 @@ authorRouter.get('/:id', (req, res) => {
     return res.status(200).json(res.author.value());
 });
 
-authorRouter.put('/:id', checkSchema(authorSchema.PUT), validate, (req, res) => {
+authorRouter.put('/:id', validateAuthor.PUT, validate, (req, res) => {
     var validRequest = Object.keys(req.body)
         .every(key => key in res.author.value());
 
