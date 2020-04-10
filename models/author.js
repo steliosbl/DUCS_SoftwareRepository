@@ -1,6 +1,6 @@
 module.exports = {
     id: {
-        in: ['body'],
+        in: ['param', 'body'],
         isEmail: true,
         escape: true,
         trim: true,

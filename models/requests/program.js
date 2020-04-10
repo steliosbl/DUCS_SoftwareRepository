@@ -1,7 +1,15 @@
 const schema = require('../program');
 const { checkSchema } = require('express-validator');
+const { authorMustExist } = require('../commonFunctions');
 
 module.exports = {
+    ALL: checkSchema({
+        id: {
+            optional: true,
+            ...schema.id
+        }
+    }),
+
     GET: checkSchema({
         id: {
             optional: true,
@@ -12,11 +20,13 @@ module.exports = {
     POST: checkSchema({
         sessionId: {
             exists: true,
-            ...schema.authorId
+            ...schema.authorId,
+            custom: authorMustExist
         },
         authorId: {
             exists: true,
-            ...schema.authorId
+            ...schema.authorId,
+            custom: authorMustExist
         },
         description: {
             optional: true,
@@ -25,13 +35,19 @@ module.exports = {
     }),
 
     PUT: checkSchema({
+        id: {
+            exists: true,
+            ...schema.id
+        },
         sessionId: {
             exists: true,
-            ...schema.authorId
+            ...schema.authorId,
+            custom: authorMustExist
         },
         authorId: {
             optional: true,
-            ...schema.authorId
+            ...schema.authorId,
+            custom: authorMustExist
         },
         description: {
             optional: true,
@@ -42,7 +58,8 @@ module.exports = {
     DELETE: checkSchema({
         sessionId: {
             exists: true,
-            ...schema.authorId
+            ...schema.authorId,
+            custom: authorMustExist
         },
         id: {
             exists: true,

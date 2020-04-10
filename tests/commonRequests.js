@@ -3,19 +3,19 @@ const app = require('../app');
 const request = supertest(app);
 
 module.exports = {
-    createAuthor: function (id='test', email='test@example.com') {
+    createAuthor: function (id='test@example.com', name='test') {
         return request.post('/author')
             .send({
                 id: id,
-                email: email
+                name: name
             })
             .expect('Content-Type', /json/);
     },
 
-    createProgram: function (author='test', description='description') {
+    createProgram: function (authorId='test@example.com', description='description') {
         return request.post('/program')
             .send({
-                author: author,
+                authorId: authorId,
                 description: description
             })
             .expect('Content-Type', /json/);

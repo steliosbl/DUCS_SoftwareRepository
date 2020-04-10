@@ -22,14 +22,14 @@ describe('Test programRouter', () => {
 
     it('Responds to POST with 201-Created if everything is alright', async () => {
         const program = {
-            author: 'test',
+            authorId: 'test',
             description: 'description'
         }
 
-        await createAuthor(program.author)
+        await createAuthor(program.authorId)
             .expect(201);
 
-        await createProgram(program.author, program.description)
+        await createProgram(program.authorId, program.description)
             .expect(201);
     });
 
@@ -39,28 +39,28 @@ describe('Test programRouter', () => {
     });
 
     it('Responds to POST with error 424-Failed Dependency if the specified author does not exist', async () => {
-        await createProgram('fake')
+        await createProgram('fake@author.com')
             .expect(424)
     });
 
     it('Responds to POST with error 422-Unprocessable Entity if a field in the request body is missing, empty or contains invalid data', async () => {
         const program = {
-            author: 'test',
+            authorId: 'test',
             description: 'description'
         };
 
-        await createAuthor(program.author)
+        await createAuthor(program.authorId)
             .expect(201);
 
         await request.post('/program')
             .send({
-                author:program.author
+                authorId:program.authorId
             })
             .expect(422);
 
         await request.post('/program')
             .send({
-                author:'',
+                authorId:'',
                 description:program.description
             })
             .expect(422);
@@ -89,14 +89,14 @@ describe('Test programRouter', () => {
 
     it('Responds to GET with the correct data when given a valid, real Id', async () => {
         const program = {
-            author: 'test',
+            authorId: 'test',
             description: 'description'
         }
 
-        await createAuthor(program.author)
+        await createAuthor(program.authorId)
             .expect(201);
 
-        const post_res = await createProgram(program.author, program.description)
+        const post_res = await createProgram(program.authorId, program.description)
             .expect(201);
 
         const id = post_res.body.id;
@@ -106,7 +106,29 @@ describe('Test programRouter', () => {
 
         expect(res.body).toHaveProperty('id');
         expect(res.body).toHaveProperty('date');
-        expect(res.body.author).toBe(program.author);
+        expect(res.body.authorId).toBe(program.authorId);
         expect(res.body.description).toBe(program.description)
     });
+
+    it('Responds to PUT with content-type JSON', async () => {
+        const res = await request.put('/program/test')
+            .expect('Content-Type', /json/);
+    });
+
+    it('Responds to PUT with 404-Not Found if given an Id that does not exist', async () => {
+        return request.put('/program/fake_id')
+            .expect(404);
+    });
+
+    it('Responds to PUT with 422-Unprocessable Entity when given keys that do not exist', async () => {
+        const id = await createProgram()
+            .expect(200).body.id;
+
+        return request.put('/program/' + id)
+            .send({
+                fake: 'key'
+            })
+            .expect(422)
+    });
+
 });
