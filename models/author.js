@@ -10,6 +10,7 @@ module.exports = {
     name: {
         in: ['body'],
         matches: /^[a-z ]+$/i, // Only characters allowed are a-z (case insensitive) and spaces
+        notEmpty: true,
         escape: true,
         trim: true
     }
