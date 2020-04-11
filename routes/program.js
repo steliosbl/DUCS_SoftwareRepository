@@ -6,6 +6,20 @@ const validate = require('../middleware/validate');
 
 const programRouter = express.Router();
 
+programRouter.all('/', validateProgram.ALL, validate, (req, res, next) => {
+    const authorExists = Boolean(req.app.db
+        .get('authors')
+        .find({
+            id: req.body.sessionId
+        }).value());
+
+    if (!authorExists) {
+        return res.respond.forbidden('SessionId does not correspond to a registered user');
+    }
+
+    next();
+})
+
 programRouter.get('/', (req, res) => {
     const all = req.app.db
         .get('programs')
@@ -56,7 +70,6 @@ programRouter.put('/', validateProgram.PUT, validate, (req, res) => {
     const old = res.program.value();
     if (req.body.sessionId === old.authorId) {
         res.program.assign({
-            authorId: req.body.authorId || old.authorId,
             description: req.body.description || old.description,
             modificationDate: new Date(Date.now()).toISOString()
         }).write();

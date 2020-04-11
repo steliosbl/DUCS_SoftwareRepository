@@ -33,11 +33,12 @@ authorRouter.all('/:id', (req, res, next) => {
         .find({
             id: req.params.id
         });
-    if (res.author.value()) {
-        next();
-    } else {
+
+    if (!res.author.value()) {
         return res.respond.notfound();
     }
+
+    next();
 });
 
 authorRouter.get('/:id', (req, res) => {

@@ -1,6 +1,5 @@
 const schema = require('../author');
 const { checkSchema } = require('express-validator');
-const { authorMustExist } = require('../commonFunctions');
 
 module.exports = {
     GET: checkSchema({
@@ -13,12 +12,7 @@ module.exports = {
     POST: checkSchema({
         id: {
             exists: true,
-            ...schema.id,
-            custom: {
-                ...authorMustExist,
-               negated: true,
-               errorMessage: 'Id already in use'
-            }
+            ...schema.id
         },
         name: {
             exists: true,
@@ -29,8 +23,7 @@ module.exports = {
     PUT: checkSchema({
         id: {
             exists: true,
-            ...schema.id,
-            custom: authorMustExist
+            ...schema.id
         },
         name: {
             optional: true,
