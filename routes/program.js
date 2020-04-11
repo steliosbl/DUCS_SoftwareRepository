@@ -6,35 +6,8 @@ const validate = require('../middleware/validate');
 
 const programRouter = express.Router();
 
-const checkSessionIdValid = (req, res, next) => {
-    const authorExists = Boolean(req.app.db
-        .get('authors')
-        .find({
-            id: req.body.sessionId
-        }).value());
-
-    if (!authorExists) {
-        return res.respond.failedDependency('SessionId does not correspond to a registered user');
-    }
-
-    next();
-};
-
-const getProgramFromQuery = (req, res, next) => {
-    if (req.query.id) {
-        res.program = req.app.db
-            .get('programs')
-            .find({
-                id: req.query.id
-            });
-
-        if (!res.program.value()) {
-            return res.respond.notfound();
-        }
-    }
-
-    next();
-};
+const checkSessionIdValid = require('../middleware/routes/checkSessionIdValid');
+const getProgramFromQuery = require('../middleware/routes/getProgramFromQuery');
 
 programRouter.get('/', validateProgram.GET, validate, getProgramFromQuery, (req, res) => {
     var value;
