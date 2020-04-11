@@ -2,17 +2,6 @@ const schema = require('../program');
 const { checkSchema } = require('express-validator');
 
 module.exports = {
-    ALL: checkSchema({
-        id: {
-            optional: true,
-            ...schema.id
-        },
-        sessionId: {
-            optional: true,
-            ...schema.authorId
-        }
-    }),
-
     GET: checkSchema({
         id: {
             optional: true,
@@ -26,7 +15,7 @@ module.exports = {
             ...schema.authorId
         },
         description: {
-            optional: true,
+            exists: true,
             ...schema.description
         }
     }),

@@ -6,7 +6,7 @@ const validate = require('../middleware/validate');
 
 const programRouter = express.Router();
 
-programRouter.all('/', validateProgram.ALL, validate, (req, res, next) => {
+const checkSessionIdValid = (req, res, next) => {
     const authorExists = Boolean(req.app.db
         .get('authors')
         .find({
@@ -14,21 +14,43 @@ programRouter.all('/', validateProgram.ALL, validate, (req, res, next) => {
         }).value());
 
     if (!authorExists) {
-        return res.respond.forbidden('SessionId does not correspond to a registered user');
+        return res.respond.failedDependency('SessionId does not correspond to a registered user');
     }
 
     next();
-})
+};
 
-programRouter.get('/', (req, res) => {
-    const all = req.app.db
-        .get('programs')
-        .value();
+const getProgramFromQuery = (req, res, next) => {
+    if (req.query.id) {
+        res.program = req.app.db
+            .get('programs')
+            .find({
+                id: req.query.id
+            });
 
-    return res.status(200).json(all);
+        if (!res.program.value()) {
+            return res.respond.notfound();
+        }
+    }
+
+    next();
+};
+
+programRouter.get('/', validateProgram.GET, validate, getProgramFromQuery, (req, res) => {
+    var value;
+
+    if (res.program) {
+        value = res.program.value();
+    } else {
+        value = req.app.db
+            .get('programs')
+            .value();
+    }
+
+    return res.status(200).json(value);
 });
 
-programRouter.post('/', validateProgram.POST, validate, (req, res) => {
+programRouter.post('/', validateProgram.POST, validate, checkSessionIdValid, (req, res) => {
     const date = new Date(Date.now()).toISOString();
     const newProgram = {
         id: shortid.generate(),
@@ -46,27 +68,7 @@ programRouter.post('/', validateProgram.POST, validate, (req, res) => {
     return res.status(201).json(newProgram);
 });
 
-programRouter.all('/', validateProgram.ALL, validate, (req, res, next) => {
-    if (req.query.id) {
-        res.program = req.app.db
-            .get('programs')
-            .find({
-                id: req.query.id
-            });
-
-        if (!res.program.value()) {
-            return res.respond.notfound();
-        }
-    }
-
-    next();
-});
-
-programRouter.get('/', (req, res) => {
-    return res.status(200).json(res.program.value());
-});
-
-programRouter.put('/', validateProgram.PUT, validate, (req, res) => {
+programRouter.put('/', validateProgram.PUT, validate, checkSessionIdValid, getProgramFromQuery, (req, res) => {
     const old = res.program.value();
     if (req.body.sessionId === old.authorId) {
         res.program.assign({
@@ -80,7 +82,7 @@ programRouter.put('/', validateProgram.PUT, validate, (req, res) => {
     return res.respond.forbidden('User does not own program');
 });
 
-programRouter.delete('/', (req, res) => {
+programRouter.delete('/', validateProgram.DELETE, validate, checkSessionIdValid, getProgramFromQuery, (req, res) => {
     if (req.body.sessionId === res.program.value().authorId) {
         const resp = req.app.db
             .get('programs')
