@@ -2,27 +2,28 @@ const supertest = require('supertest');
 const app = require('../app');
 const request = supertest(app);
 
-const defaultValues = {
+const defaults = {
     authorId: 'test@example.com',
     name: 'Test',
     description: 'Description'
 }
 
 module.exports = {
-    createAuthor: function (id, name) {
+    defaults: defaults, 
+    createAuthor: (id, name) => {
         return request.post('/author')
             .send({
-                id: id || defaultValues.authorId,
-                name: name || defaultValues.name
+                id: id || defaults.authorId,
+                name: name || defaults.name
             })
             .expect('Content-Type', /json/);
     },
 
-    createProgram: function (sessionId, description, ) {
+    createProgram:(sessionId, description) => {
         return request.post('/program')
             .send({
-                description: description || defaultValues.description,
-                sessionId: sessionId || defaultValues.authorId
+                description: description || defaults.description,
+                sessionId: sessionId || defaults.authorId
             })
             .expect('Content-Type', /json/);
     }
