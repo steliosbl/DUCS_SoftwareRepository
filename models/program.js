@@ -4,7 +4,6 @@ const author = require('./author');
 module.exports = {
     id: {
         in: ['query'],
-        isAlphanumeric: true,
         escape: true,
         trim: true,
         custom: {
