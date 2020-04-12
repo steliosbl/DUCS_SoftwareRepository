@@ -16,9 +16,11 @@ imageRouter.use(fileUpload({
     }
 }));
 
-imageRouter.use(express.static(path.join(__dirname, '../.data/static')));
+imageRouter.use(express.static(path.join(__dirname, '../.data/static/images'), {
+    extensions: ['png']
+}));
 
-imageRouter.post('/upload', validateImage.POST, validate, checkSessionIdValid, (req, res) => {
+imageRouter.post('/', validateImage.POST, validate, checkSessionIdValid, (req, res) => {
     const program = req.app.db.get('programs')
         .find({
             id: req.body.id
@@ -34,17 +36,13 @@ imageRouter.post('/upload', validateImage.POST, validate, checkSessionIdValid, (
                     }
                     return res.respond.tooLarge('File too large, limit is 1MB');
                 }
-                return res.respond.invalid('Invalid file type, must be image/png');
+                return res.respond.unprocessable('Invalid file type, must be image/png');
             }
             return res.respond.unprocessable('No files were uploaded');
         }
         return res.respond.forbidden('User does not own program');
     }
     return res.respond.notFound('Id does not match an existing program');
-});
-
-imageRouter.get('*', (req, res) => {
-    res.redirect('/assets/placeholder.svg');
 });
 
 module.exports = imageRouter;

@@ -76,7 +76,7 @@ describe('Test authorRouter', () => {
             });
     });
 
-    it('Responds to POST with 409-Conflict if the given Id is already in use', async () => {
+    it('Responds to POST with error 409-Conflict if the given Id is already in use', async () => {
         await createAuthor(defaults.authorId, 'foo')
             .expect(201);
 
@@ -84,12 +84,12 @@ describe('Test authorRouter', () => {
             .expect(409);
     });
 
-    it('Responds to GET with 404-Not Found if not given an Id', async () => {
+    it('Responds to GET with error 404-Not Found if not given an Id', async () => {
         return await request.get('/author')
             .expect(404);
     });
 
-    it('Responds to GET with 404-Not Found if given an Id that doesnt exist', async () => {
+    it('Responds to GET with error 404-Not Found if given an Id that doesnt exist', async () => {
         return await request.get('/author/fake_id@example.com')
             .expect(404);
     });

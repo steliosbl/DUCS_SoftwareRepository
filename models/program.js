@@ -3,7 +3,7 @@ const author = require('./author');
 
 module.exports = {
     id: {
-        in: ['query'],
+        in: ['body', 'query'],
         escape: true,
         trim: true,
         custom: {

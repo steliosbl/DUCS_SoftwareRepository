@@ -68,12 +68,12 @@ describe('Test programRouter', () => {
             .expect('Content-Type', /json/);
     });
 
-    it('Responds to GET with 404-Not Found if given an Id that does not exist', async () => {
+    it('Responds to GET with error 404-Not Found if given an Id that does not exist', async () => {
         await request.get('/program?id=hKNNoMPFh')
             .expect(404);
     });
 
-    it('Responds to GET with 422-Unprocessable Entity if given an Id that could not exist', async () => {
+    it('Responds to GET with error 422-Unprocessable Entity if given an Id that could not exist', async () => {
         await request.get('/program?id=%23%23')
             .expect(422);
     });
@@ -102,7 +102,7 @@ describe('Test programRouter', () => {
             .expect('Content-Type', /json/);
     });
 
-    it('Responds to PUT with 424-Failed Dependency if given a sessionId that does not exit', async () => {
+    it('Responds to PUT with error 424-Failed Dependency if given a sessionId that does not exit', async () => {
         await createAuthor()
             .expect(201)
 
@@ -115,7 +115,7 @@ describe('Test programRouter', () => {
             }).expect(424);
     });
 
-    it('Responds to PUT with 403-Forbidden if given a sessionId that does not match the authorId of the program', async () => {
+    it('Responds to PUT with error 403-Forbidden if given a sessionId that does not match the authorId of the program', async () => {
         await createAuthor()
             .expect(201);
 
@@ -131,7 +131,7 @@ describe('Test programRouter', () => {
             }).expect(403);
     })
 
-    it('Responds to PUT with 404-Not Found if given an Id that does not exist', async () => {
+    it('Responds to PUT with error 404-Not Found if given an Id that does not exist', async () => {
         await createAuthor()
             .expect(201);
 
@@ -141,7 +141,7 @@ describe('Test programRouter', () => {
             }).expect(404);
     });
 
-    it('Responds to PUT with 422-Unprocessable Entity when given keys that do not exist', async () => {
+    it('Responds to PUT with error 422-Unprocessable Entity when given keys that do not exist', async () => {
         await createAuthor()
             .expect(201);
 
