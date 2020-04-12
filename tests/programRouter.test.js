@@ -2,6 +2,8 @@ const supertest = require('supertest');
 const app = require('../app');
 const db = require('../db');
 const request = supertest(app);
+const defaults = require('./data/defaults');
+
 const {
     defaults,
     createAuthor,

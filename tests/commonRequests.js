@@ -2,14 +2,9 @@ const supertest = require('supertest');
 const app = require('../app');
 const request = supertest(app);
 
-const defaults = {
-    authorId: 'test@example.com',
-    name: 'Test',
-    description: 'Description'
-}
+const defaults = require('./data/defaults');
 
-module.exports = {
-    defaults: defaults, 
+module.exports = { 
     createAuthor: (id, name) => {
         return request.post('/author')
             .send({

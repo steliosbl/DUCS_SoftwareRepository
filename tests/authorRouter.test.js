@@ -3,6 +3,7 @@ const app = require('../app');
 const db = require('../db');
 const request = supertest(app);
 const commonRequests = require('./commonRequests');
+const defaults = require('./data/defaults');
 
 describe('Test authorRouter', () => {
     // beforeEach is used to re-create the database between tests
@@ -25,62 +26,59 @@ describe('Test authorRouter', () => {
     it('Responds to POST with error 422-Unprocessable Entity if a field in the request body is missing, empty or contains invalid data', async () => {
         await request.post('/author')
             .send({
-                id: 'test@example.com'
+                id: defaults.authorId
             })
             .expect(422);
 
         await request.post('/author')
             .send({
-                name: 'test'
+                name: defaults.name
             })
             .expect(422);
 
         await request.post('/author')
             .send({
                 name: '',
-                id: 'test@example.com'
+                id: defaults.authorId
             })
             .expect(422);
 
         await request.post('/author')
             .send({
                 id: '',
-                name: 'test'
+                name: defaults.name
             })
             .expect(422);
 
         await request.post('/author')
             .send({
                 name: '~!@#$%^&*()_+',
-                id: 'test@example.com"'
+                id: defaults.authorId
             })
             .expect(422);
+
         await request.post('/author')
             .send({
                 id: 'not_an_id',
-                name: 'test'
+                name: defaults.name
             })
             .expect(422);
     });
 
     it('Responds to POST with 201-Created and the right data if everything is correct', async () => {
-        const name = 'test';
-        const id = 'test@example.com'
-        const res = await commonRequests.createAuthor(id, name)
+        const res = await commonRequests.createAuthor()
             .expect(201);
 
-        expect(res.body.name).toBe(name);
-        expect(res.body.id).toBe(id);
+        expect(res.body.name).toBe(defaults.name);
+        expect(res.body.id).toBe(defaults.authorId);
         expect(res.body).toHaveProperty('registrationDate');
     });
 
     it('Responds to POST with 409-Conflict if the given Id is already in use', async () => {
-        const id = 'used@id.com';
-
-        await commonRequests.createAuthor(id, 'foo')
+        await commonRequests.createAuthor(defaults.authorId, 'foo')
             .expect(201);
 
-        return await commonRequests.createAuthor(id, "bar")
+        return await commonRequests.createAuthor(defaults.authorId, "bar")
             .expect(409);
     });
 
@@ -90,21 +88,19 @@ describe('Test authorRouter', () => {
     });
 
     it('Responds to GET with 404-Not Found if given an Id that doesnt exist', async () => {
-        return await request.get('/author/fake_id')
+        return await request.get('/author/fake_id@example.com')
             .expect(404);
     });
 
     it('Responds to GET with 201-Created and the correct data if given an name that corresponds to a data item', async () => {
-        const name = 'test';
-        const id = 'test@example.com'
-        await commonRequests.createAuthor(id,name)
+        await commonRequests.createAuthor()
             .expect(201);
 
-        const res = await request.get('/author/' + id)
+        const res = await request.get('/author/' + defaults.authorId)
             .expect(200);
 
-        expect(res.body.name).toBe(name);
-        expect(res.body).toHaveProperty('id');
+        expect(res.body.id).toBe(defaults.authorId);
+        expect(res.body.name).toBe(defaults.name);
         expect(res.body).toHaveProperty('registrationDate');
     });
 });
