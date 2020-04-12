@@ -2,8 +2,9 @@ const supertest = require('supertest');
 const app = require('../app');
 const db = require('../db');
 const request = supertest(app);
-const commonRequests = require('./commonRequests');
+
 const defaults = require('./data/defaults');
+const { createAuthor } = require('./commonRequests');
 
 describe('Test authorRouter', () => {
     // beforeEach is used to re-create the database between tests
@@ -66,19 +67,20 @@ describe('Test authorRouter', () => {
     });
 
     it('Responds to POST with 201-Created and the right data if everything is correct', async () => {
-        const res = await commonRequests.createAuthor()
-            .expect(201);
-
-        expect(res.body.name).toBe(defaults.name);
-        expect(res.body.id).toBe(defaults.authorId);
-        expect(res.body).toHaveProperty('registrationDate');
+        await createAuthor()
+            .expect(201)
+            .then(res => {
+                expect(res.body.name).toBe(defaults.name);
+                expect(res.body.id).toBe(defaults.authorId);
+                expect(res.body).toHaveProperty('registrationDate');
+            });
     });
 
     it('Responds to POST with 409-Conflict if the given Id is already in use', async () => {
-        await commonRequests.createAuthor(defaults.authorId, 'foo')
+        await createAuthor(defaults.authorId, 'foo')
             .expect(201);
 
-        return await commonRequests.createAuthor(defaults.authorId, "bar")
+        return await createAuthor(defaults.authorId, "bar")
             .expect(409);
     });
 
@@ -93,14 +95,15 @@ describe('Test authorRouter', () => {
     });
 
     it('Responds to GET with 201-Created and the correct data if given an name that corresponds to a data item', async () => {
-        await commonRequests.createAuthor()
+        await createAuthor()
             .expect(201);
 
-        const res = await request.get('/author/' + defaults.authorId)
-            .expect(200);
-
-        expect(res.body.id).toBe(defaults.authorId);
-        expect(res.body.name).toBe(defaults.name);
-        expect(res.body).toHaveProperty('registrationDate');
+        await request.get('/author/' + defaults.authorId)
+            .expect(200)
+            .then(res => {
+                expect(res.body.id).toBe(defaults.authorId);
+                expect(res.body.name).toBe(defaults.name);
+                expect(res.body).toHaveProperty('registrationDate');
+            });
     });
 });

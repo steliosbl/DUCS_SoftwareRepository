@@ -2,13 +2,9 @@ const supertest = require('supertest');
 const app = require('../app');
 const db = require('../db');
 const request = supertest(app);
-const defaults = require('./data/defaults');
 
-const {
-    defaults,
-    createAuthor,
-    createProgram,
-} = require('./commonRequests');
+const defaults = require('./data/defaults');
+const { createAuthor, createProgram } = require('./commonRequests');
 
 describe('Test programRouter', () => {
     // beforeEach is used to re-create the database between tests
@@ -52,22 +48,19 @@ describe('Test programRouter', () => {
 
         await request.post('/program')
             .send({
-                sessionId:program.sessionId
-            })
-            .expect(422);
+                sessionId: program.sessionId
+            }).expect(422);
 
         await request.post('/program')
             .send({
-                sessionId:'',
-                description:program.description
-            })
-            .expect(422);
+                sessionId: '',
+                description: program.description
+            }).expect(422);
 
         await request.post('/program')
             .send({
-                description:program.description
-            })
-            .expect(422);
+                description: program.description
+            }).expect(422);
     });
 
     it('Responds to GET with content-type JSON', async () => {
@@ -89,20 +82,19 @@ describe('Test programRouter', () => {
         await createAuthor()
             .expect(201);
 
-        const post_res = await createProgram()
-            .expect(201);
+        const id = (await createProgram()
+            .expect(201)).body.id;
 
-        const id = post_res.body.id;
-
-        const res = await request.get('/program?id=' + id)
-            .expect(200);
-
-        expect(res.body).toHaveProperty('id');
-        expect(res.body).toHaveProperty('creationDate');
-        expect(res.body).toHaveProperty('modificationDate');
-        expect(res.body.authorId).toBe(defaults.authorId);
-        expect(res.body.description).toBe(defaults.description)
-        expect(res.body.creationDate).toBe(res.body.modificationDate);
+        await request.get('/program?id=' + id)
+            .expect(200)
+            .then(res => {
+                expect(res.body).toHaveProperty('id');
+                expect(res.body).toHaveProperty('creationDate');
+                expect(res.body).toHaveProperty('modificationDate');
+                expect(res.body.authorId).toBe(defaults.authorId);
+                expect(res.body.description).toBe(defaults.description)
+                expect(res.body.creationDate).toBe(res.body.modificationDate);
+            })
     });
 
     it('Responds to PUT with content-type JSON', async () => {
@@ -114,14 +106,13 @@ describe('Test programRouter', () => {
         await createAuthor()
             .expect(201)
 
-        const res = await createProgram()
-            .expect(201);
+        const id = (await createProgram()
+            .expect(201)).body.id;
 
-        await request.put('/program?id=' + res.body.id)
+        await request.put('/program?id=' + id)
             .send({
                 sessionId: 'fake@author.com'
-            })
-            .expect(424);
+            }).expect(424);
     });
 
     it('Responds to PUT with 403-Forbidden if given a sessionId that does not match the authorId of the program', async () => {
@@ -137,8 +128,7 @@ describe('Test programRouter', () => {
         await request.put('/program?id=' + id)
             .send({
                 sessionId: authorId
-            })
-            .expect(403);
+            }).expect(403);
     })
 
     it('Responds to PUT with 404-Not Found if given an Id that does not exist', async () => {
@@ -147,9 +137,8 @@ describe('Test programRouter', () => {
 
         return request.put('/program?id=hKNNoMPFh')
             .send({
-                sessionId:defaults.authorId
-            })
-            .expect(404);
+                sessionId: defaults.authorId
+            }).expect(404);
     });
 
     it('Responds to PUT with 422-Unprocessable Entity when given keys that do not exist', async () => {
@@ -161,8 +150,7 @@ describe('Test programRouter', () => {
         return request.put('/program?id=' + id)
             .send({
                 fake: 'key'
-            })
-            .expect(422)
+            }).expect(422)
     });
 
 });
