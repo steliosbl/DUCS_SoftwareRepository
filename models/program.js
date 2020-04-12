@@ -1,7 +1,9 @@
 const shortid = require('shortid');
-const author = require('./author');
+const { checkSchema } = require('express-validator');
 
-module.exports = {
+const { schema: author } = require('./author');
+
+const schema = {
     id: {
         in: ['body', 'query'],
         escape: true,
@@ -19,4 +21,56 @@ module.exports = {
         escape: true,
         trim: true
     }
+};
+
+module.exports = {
+    schema: schema,
+
+    GET: checkSchema({
+        id: {
+            optional: true,
+            ...schema.id
+        }
+    }),
+
+    POST: checkSchema({
+        sessionId: {
+            exists: true,
+            ...schema.authorId
+        },
+        description: {
+            exists: true,
+            ...schema.description
+        }
+    }),
+
+    PUT: checkSchema({
+        id: {
+            exists: true,
+            ...schema.id
+        },
+        sessionId: {
+            exists: true,
+            ...schema.authorId
+        },
+        authorId: {
+            optional: true,
+            ...schema.authorId
+        },
+        description: {
+            optional: true,
+            ...schema.description
+        }
+    }),
+
+    DELETE: checkSchema({
+        sessionId: {
+            exists: true,
+            ...schema.authorId
+        },
+        id: {
+            exists: true,
+            ...schema.id
+        }
+    })
 };

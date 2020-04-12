@@ -1,5 +1,5 @@
 const express = require('express');
-const validateAuthor = require('../models/requests/author');
+const validateAuthor = require('../models/author');
 const validate = require('../middleware/validate');
 
 const authorRouter = express.Router();

@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const fileUpload = require('express-fileupload');
 
-const validateImage = require('../models/requests/image');
+const validateImage = require('../models/image');
 const validate = require('../middleware/validate');
 
 const imageRouter = express.Router();

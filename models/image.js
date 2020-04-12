@@ -1,5 +1,5 @@
-const author = require('../author');
-const program = require('../program');
+const { schema: author } = require('./author');
+const { schema: program } = require('./program');
 const { checkSchema } = require('express-validator');
 
 module.exports = {

@@ -1,7 +1,7 @@
 const express = require('express');
 const shortid = require('shortid');
 
-const validateProgram = require('../models/requests/program');
+const validateProgram = require('../models/program');
 const validate = require('../middleware/validate');
 
 const programRouter = express.Router();
