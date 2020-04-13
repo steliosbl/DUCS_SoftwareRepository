@@ -1,3 +1,5 @@
+var HttpStatus = require('http-status-codes');
+
 module.exports = (req, res, next) => {
     if (req.query.id) {
         res.program = req.app.db
@@ -7,7 +9,9 @@ module.exports = (req, res, next) => {
             });
 
         if (!res.program.value()) {
-            return res.respond.notfound();
+            return res.status(HttpStatus.NOT_FOUND).json({
+                errors: ['Program with specified Id not found']
+            });
         }
     }
 

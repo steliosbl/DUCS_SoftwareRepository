@@ -29,6 +29,7 @@
     "express": "^4.17.1",
     "express-fileupload": "^1.1.7-alpha.1",
     "express-validator": "^6.4.0",
+    "http-status-codes": "^1.4.0",
     "lowdb": "^1.0.0",
     "morgan": "^1.10.0",
     "shortid": "^2.2.15"

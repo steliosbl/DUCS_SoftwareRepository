@@ -1,8 +1,8 @@
 // Import express and other packages
 const express = require('express');
 const path = require('path');
+var HttpStatus = require('http-status-codes');
 
-const errors = require('./middleware/errors');
 const jsonErrorHandler = require('./middleware/jsonErrorHandler');
 
 const programRouter = require('./routes/program');
@@ -21,19 +21,21 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Set JSON encoding
 app.use(express.json());
 
-// Common responses
-app.use(errors);
-
 app.use('/program', programRouter);
 app.use('/image', imageRouter);
 app.use('/author', authorRouter);
 
 app.get('/', (req, res) => {
-  res.status(200).sendFile('index.html', { root: path.join(__dirname, 'views') });
+  res.status(HttpStatus.OK)
+    .sendFile('index.html', {
+      root: path.join(__dirname, 'views')
+    });
 });
 
 app.get('*', (req, res) => {
-  res.respond.notfound();
+  res.status(HttpStatus.NOT_FOUND).json({
+    errors: ['Not found']
+  });
 });
 
 app.use(jsonErrorHandler);

@@ -1,4 +1,5 @@
 const { validationResult } = require('express-validator');
+var HttpStatus = require('http-status-codes');
 
 module.exports = (req, res, next) => {
   const errors = validationResult(req);
@@ -11,7 +12,7 @@ module.exports = (req, res, next) => {
     [err.param]: err.msg
   }));
 
-  return res.status(422).json({
+  return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
     errors: extractedErrors
   });
 };

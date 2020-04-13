@@ -1,13 +1,14 @@
 const express = require('express');
 const shortid = require('shortid');
+var HttpStatus = require('http-status-codes');
 
 const validateProgram = require('../models/program');
 const validate = require('../middleware/validate');
 
 const programRouter = express.Router();
 
-const checkSessionIdValid = require('../middleware/routes/checkSessionIdValid');
-const getProgramFromQuery = require('../middleware/routes/getProgramFromQuery');
+const checkSessionIdValid = require('../middleware/checkSessionIdValid');
+const getProgramFromQuery = require('../middleware/getProgramFromQuery');
 
 programRouter.get('/', validateProgram.GET, validate, getProgramFromQuery, (req, res) => {
     var value;
@@ -20,7 +21,8 @@ programRouter.get('/', validateProgram.GET, validate, getProgramFromQuery, (req,
             .value();
     }
 
-    return res.status(200).json(value);
+    return res.status(HttpStatus.OK)
+        .json(value);
 });
 
 programRouter.post('/', validateProgram.POST, validate, checkSessionIdValid, (req, res) => {
@@ -38,7 +40,8 @@ programRouter.post('/', validateProgram.POST, validate, checkSessionIdValid, (re
         .push(newProgram)
         .write();
 
-    return res.status(201).json(newProgram);
+    return res.status(HttpStatus.CREATED)
+        .json(newProgram);
 });
 
 programRouter.put('/', validateProgram.PUT, validate, checkSessionIdValid, getProgramFromQuery, (req, res) => {
@@ -49,10 +52,13 @@ programRouter.put('/', validateProgram.PUT, validate, checkSessionIdValid, getPr
             modificationDate: new Date(Date.now()).toISOString()
         }).write();
 
-        return res.status(200).json(res.program.value());
+        return res.status(HttpStatus.OK)
+            .json(res.program.value());
     }
 
-    return res.respond.forbidden('User does not own program');
+    return res.status(HttpStatus.FORBIDDEN).json({
+        errors: ['User does not own program']
+    });
 });
 
 programRouter.delete('/', validateProgram.DELETE, validate, checkSessionIdValid, getProgramFromQuery, (req, res) => {
@@ -63,10 +69,13 @@ programRouter.delete('/', validateProgram.DELETE, validate, checkSessionIdValid,
                 id: req.query.id
             }).write();
 
-        return res.status(200).json(resp);
+        return res.status(HttpStatus.OK)
+            .json(resp);
     }
 
-    return res.respond.forbiddden('User does not own program');
+    return res.status(HttpStatus.FORBIDDEN).json({
+        errors: ['User does not own program']
+    });
 });
 
 module.exports = programRouter;

@@ -1,3 +1,5 @@
+var HttpStatus = require('http-status-codes');
+
 module.exports = (req, res, next) => {
     const authorExists = Boolean(req.app.db
         .get('authors')
@@ -6,7 +8,9 @@ module.exports = (req, res, next) => {
         }).value());
 
     if (!authorExists) {
-        return res.respond.failedDependency('SessionId does not correspond to a registered user');
+        return res.status(HttpStatus.FAILED_DEPENDENCY).json({
+            errors: ['SessionId does not correspond to a registered user']
+        });
     }
 
     next();

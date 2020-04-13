@@ -1,13 +1,14 @@
 const express = require('express');
 const path = require('path');
 const fileUpload = require('express-fileupload');
+var HttpStatus = require('http-status-codes');
 
 const validateImage = require('../models/image');
 const validate = require('../middleware/validate');
 
 const imageRouter = express.Router();
 
-const checkSessionIdValid = require('../middleware/routes/checkSessionIdValid');
+const checkSessionIdValid = require('../middleware/checkSessionIdValid');
 
 imageRouter.use(fileUpload({
     limits: {
@@ -32,17 +33,29 @@ imageRouter.post('/', validateImage.POST, validate, checkSessionIdValid, (req, r
                 if (req.files.image.mimetype === 'image/png') {
                     if (!req.files.image.truncated) {
                         req.files.image.mv(path.join(__dirname, '../.data/static/images/', req.body.id + '.png'));
-                        return res.status(200).json();
+                        return res.status(HttpStatus.OK)
+                            .json();
                     }
-                    return res.respond.tooLarge('File too large, limit is 1MB');
+                    return res.status(HttpStatus.REQUEST_TOO_LONG)
+                        .json({
+                            errors: ['File too large, limit is 1MB']
+                        });
                 }
-                return res.respond.unprocessable('Invalid file type, must be image/png');
+                return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
+                    errors: ['Invalid file type, must be image/png']
+                });
             }
-            return res.respond.unprocessable('No files were uploaded');
+            return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
+                errors: ['No files were uploaded']
+            });
         }
-        return res.respond.forbidden('User does not own program');
+        return res.status(HttpStatus.FORBIDDEN).json({
+            errors: ['User does not own program']
+        });
     }
-    return res.respond.notFound('Id does not match an existing program');
+    return res.status(HttpStatus.NOT_FOUND).json({
+        errors: ['Id does not match an existing program']
+    });
 });
 
 module.exports = imageRouter;
