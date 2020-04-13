@@ -65,7 +65,7 @@ describe('Test imageRouter', () => {
             .expect(422);
     });
 
-    it('Responds to POST with error 422-Unproccessable Entity if no file is uploaded', async () => {
+    it('Responds to POST with error 422-Unprocessable Entity if no file is uploaded', async () => {
         await createAuthor()
             .expect(201);
 
