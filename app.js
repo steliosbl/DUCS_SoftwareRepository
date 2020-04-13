@@ -1,30 +1,38 @@
 // Import express and other packages
 const express = require('express');
 const path = require('path');
-var HttpStatus = require('http-status-codes');
+const HttpStatus = require('http-status-codes');
+const morgan = require('morgan');
 
+// Import middleware
 const jsonErrorHandler = require('./middleware/jsonErrorHandler');
 
+// Import routers
 const programRouter = require('./routes/program');
 const imageRouter = require('./routes/image');
 const authorRouter = require('./routes/author');
 
-const morgan = require('morgan');
-
 // Initialize app
 const app = express();
 
-// Initialize logging
-app.use(morgan('dev'));
+// Initialize error handling
+app.use(jsonErrorHandler);
 
-app.use(express.static(path.join(__dirname, 'public')));
+// Initialize logging only if the app is not being tested with jest
+if (process.env.NODE_ENV !== 'test') {
+  app.use(morgan('dev'));
+}
+
 // Set JSON encoding
 app.use(express.json());
 
+// Initialize paths
+app.use(express.static(path.join(__dirname, 'public')));
 app.use('/program', programRouter);
 app.use('/image', imageRouter);
 app.use('/author', authorRouter);
 
+// Redirect root path to index.html
 app.get('/', (req, res) => {
   res.status(HttpStatus.OK)
     .sendFile('index.html', {
@@ -32,12 +40,11 @@ app.get('/', (req, res) => {
     });
 });
 
+// Redirect all non-matching GETs to custom 404
 app.get('*', (req, res) => {
   res.status(HttpStatus.NOT_FOUND).json({
     errors: ['Not found']
   });
 });
-
-app.use(jsonErrorHandler);
 
 module.exports = app;

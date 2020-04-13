@@ -16,6 +16,7 @@ const db = {
                 : new FileAsync('.data/db.json')
         );
 
+        // Write the default values to the database if they do not exist
         app.db.defaults({
             authors: [],
             programs: []
