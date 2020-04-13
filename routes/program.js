@@ -2,15 +2,14 @@ const express = require('express');
 const shortid = require('shortid');
 var HttpStatus = require('http-status-codes');
 
-const validateProgram = require('../models/program');
-const validate = require('../middleware/validate');
-
-const programRouter = express.Router();
-
+const validate = require('../models/program');
+const reportValidationErrors = require('../middleware/reportValidationErrors');
 const checkSessionIdValid = require('../middleware/checkSessionIdValid');
 const getProgramFromQuery = require('../middleware/getProgramFromQuery');
 
-programRouter.get('/', validateProgram.GET, validate, getProgramFromQuery, (req, res) => {
+const programRouter = express.Router();
+
+programRouter.get('/', validate.GET, reportValidationErrors, getProgramFromQuery, (req, res) => {
     var value;
 
     if (res.program) {
@@ -25,7 +24,7 @@ programRouter.get('/', validateProgram.GET, validate, getProgramFromQuery, (req,
         .json(value);
 });
 
-programRouter.post('/', validateProgram.POST, validate, checkSessionIdValid, (req, res) => {
+programRouter.post('/', validate.POST, reportValidationErrors, checkSessionIdValid, (req, res) => {
     const date = new Date(Date.now()).toISOString();
     const newProgram = {
         id: shortid.generate(),
@@ -44,7 +43,7 @@ programRouter.post('/', validateProgram.POST, validate, checkSessionIdValid, (re
         .json(newProgram);
 });
 
-programRouter.put('/', validateProgram.PUT, validate, checkSessionIdValid, getProgramFromQuery, (req, res) => {
+programRouter.put('/', validate.PUT, reportValidationErrors, checkSessionIdValid, getProgramFromQuery, (req, res) => {
     const old = res.program.value();
     if (req.body.sessionId === old.authorId) {
         res.program.assign({
@@ -61,7 +60,7 @@ programRouter.put('/', validateProgram.PUT, validate, checkSessionIdValid, getPr
     });
 });
 
-programRouter.delete('/', validateProgram.DELETE, validate, checkSessionIdValid, getProgramFromQuery, (req, res) => {
+programRouter.delete('/', validate.DELETE, reportValidationErrors, checkSessionIdValid, getProgramFromQuery, (req, res) => {
     if (req.body.sessionId === res.program.value().authorId) {
         const resp = req.app.db
             .get('programs')

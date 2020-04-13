@@ -1,11 +1,12 @@
 const express = require('express');
-const validateAuthor = require('../models/author');
-const validate = require('../middleware/validate');
 var HttpStatus = require('http-status-codes');
+
+const validate = require('../models/author');
+const reportValidationErrors = require('../middleware/reportValidationErrors');
 
 const authorRouter = express.Router();
 
-authorRouter.post('/', validateAuthor.POST, validate, (req, res) => {
+authorRouter.post('/', validate.POST, reportValidationErrors, (req, res) => {
     const idAvailable = !req.app.db
         .get('authors')
         .find({
@@ -54,7 +55,7 @@ authorRouter.get('/:id', (req, res) => {
         .json(res.author.value());
 });
 
-authorRouter.put('/:id', validateAuthor.PUT, validate, (req, res) => {
+authorRouter.put('/:id', validate.PUT, reportValidationErrors, (req, res) => {
     var validRequest = Object.keys(req.body)
         .every(key => key in res.author.value());
 

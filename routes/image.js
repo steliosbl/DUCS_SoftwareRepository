@@ -3,12 +3,11 @@ const path = require('path');
 const fileUpload = require('express-fileupload');
 var HttpStatus = require('http-status-codes');
 
-const validateImage = require('../models/image');
-const validate = require('../middleware/validate');
+const validate = require('../models/image');
+const reportValidationErrors = require('../middleware/reportValidationErrors');
+const checkSessionIdValid = require('../middleware/checkSessionIdValid');
 
 const imageRouter = express.Router();
-
-const checkSessionIdValid = require('../middleware/checkSessionIdValid');
 
 imageRouter.use(fileUpload({
     limits: {
@@ -21,7 +20,7 @@ imageRouter.use(express.static(path.join(__dirname, '../.data/static/images'), {
     extensions: ['png']
 }));
 
-imageRouter.post('/', validateImage.POST, validate, checkSessionIdValid, (req, res) => {
+imageRouter.post('/', validate.POST, reportValidationErrors, checkSessionIdValid, (req, res) => {
     const program = req.app.db.get('programs')
         .find({
             id: req.body.id
