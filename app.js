@@ -40,6 +40,14 @@ app.get('/', (req, res) => {
     });
 });
 
+// Redirect search path to index.html
+app.get('/search', (req, res) => {
+  res.status(HttpStatus.OK)
+    .sendFile('index.html', {
+      root: path.join(__dirname, 'views')
+    });
+});
+
 // Redirect all non-matching GETs to custom 404
 app.get('*', (req, res) => {
   res.status(HttpStatus.NOT_FOUND).json({

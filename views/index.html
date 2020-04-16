@@ -1,16 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <title>Index Page</title>
     <meta charset="UTF-8">
     <meta name="description" content="DU Computer Science Programming-Y1 Summative 2">
     <meta name="keywords" content="">
     <meta name="author" content="kqcr86">
-    <meta content="width=device-width, initial-scale=1, minimum-scale=1" name="viewport"/>
-    <link rel="stylesheet" href="css/index.css">
-    <script src="js/index.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="index.css">
 </head>
+
 <body>
-    <h1>Hello World</h1>
+    <nav class="navbar navbar-expand sticky-top navbar-dark">
+        <a class="navbar-brand" href="/">
+            <img src="assets/placeholder.svg" width="30" height="30" class="d-inline-block align-top text-white" alt="">
+        </a>
+        <button class="btn btn-primary ml-auto">Welcome <span id="user_name">Stranger</span></button>
+    </nav>
+    <section id="search_bar" class="vertical-center p-4">
+        <div class="container">
+            <div class="row justify-content-center align-items-center">
+                <div class="input-group">
+                    <input id="search_box" type="text" class="rounded form-control form-control-lg" placeholder="Search by Id, Author, Name...">
+                    <div id="search_bar_spacer" class="w-100"></div>
+                    <div id="search_bar_buttons" class="mx-auto pt-4">
+                        <button id="search_button" class="btn btn-lg btn-primary" type="button">Search</button>
+                        <button id="new_button" class="btn ml-2 btn-lg btn-primary" type="button">New</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <main>
+        <div id="card_proto" class="card mb-3 p-2 d-none">
+            <div class="row no-gutters">
+                <div class="col-md-4">
+                    <img class="img-fluid mx-auto d-block bd-placeholder-img data-image" src="assets/placeholder.svg">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title data-title">{title}</h5>
+                        <p class="card-text data-description">{descritpion}</p>
+                        <p class="card-text text-right">By <span class="data-author">{name}</span></p>
+                        <p class="card-text"><small class="text-muted">Last updated <span class="data-modification-date">{date}</span></small></p>
+                        <p class="card-text"><small class="text-muted">Created <span class="data-creation-date">{date}</span></small></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="card_container" class="container">
+
+        </div>
+        <nav class='d-none'>
+            <ul class="pagination justify-content-center">
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" tabindex="-1">Previous</a>
+                </li>
+                <li class="page-item"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item">
+                    <a class="page-link" href="#">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </main>
+    <footer>
+
+    </footer>
+    <!-- Bootstrap JS Dependencies -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous">
+    </script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous">
+    </script>
+    <!-- Client Script -->
+    <script src="index.js" defer></script>
 </body>
+
 </html>

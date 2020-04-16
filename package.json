@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "dev": "npm run server & npm run client",
-    "client": "browser-sync start --proxy=localhost:8000 --files='public' --ignore=node_modules --reload-delay 10 --no-ui --no-notify",
+    "client": "browser-sync start --proxy=localhost:8000 --files=['public', 'views'] --ignore=node_modules --reload-delay 10 --no-ui --no-notify",
     "server": "nodemon --ignore './tests' ./server.js",
     "pretest": "eslint --fix *.js",
     "test": "jest"
