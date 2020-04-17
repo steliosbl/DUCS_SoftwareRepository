@@ -69,7 +69,7 @@ describe('Test programRouter', () => {
     });
 
     it('Responds to GET with error 404-Not Found if given an Id that does not exist', async () => {
-        await request.get('/program?id=hKNNoMPFh')
+        await request.get('/program?id=Uakgb_J5m9g-0JDMbcJqL')
             .expect(404);
     });
 
@@ -135,7 +135,7 @@ describe('Test programRouter', () => {
         await createAuthor()
             .expect(201);
 
-        return request.put('/program?id=hKNNoMPFh')
+        return request.put('/program?id=Uakgb_J5m9g-0JDMbcJqL')
             .send({
                 sessionId: defaults.authorId
             }).expect(404);

@@ -1,5 +1,5 @@
 const express = require('express');
-const shortid = require('shortid');
+const nanoid = require('nanoid');
 const HttpStatus = require('http-status-codes');
 
 // Import validation dependencies
@@ -48,7 +48,7 @@ programRouter.post('/', validate.POST, reportValidationErrors, (req, res) => {
     if (authorExists) {
         const date = new Date(Date.now()).toISOString();
         const newProgram = {
-            id: shortid.generate(),
+            id: nanoid.nanoid(),
             creationDate: date,
             modificationDate: date,
             authorId: req.body.sessionId,
