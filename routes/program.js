@@ -1,5 +1,5 @@
 const express = require('express');
-const nanoid = require('nanoid');
+const idGenerator = require('../idGenerator');
 const HttpStatus = require('http-status-codes');
 
 // Import validation dependencies
@@ -48,7 +48,7 @@ programRouter.post('/', validate.POST, reportValidationErrors, (req, res) => {
     if (authorExists) {
         const date = new Date(Date.now()).toISOString();
         const newProgram = {
-            id: nanoid.nanoid(),
+            id: idGenerator(),
             creationDate: date,
             modificationDate: date,
             authorId: req.body.sessionId,
@@ -92,7 +92,6 @@ programRouter.put('/', validate.PUT, reportValidationErrors, getProgramFrom('que
 // The middleware attempts to get the program being edited from the query Id
 // The middleware verifies the sessionId given in the request body
 programRouter.delete('/', validate.DELETE, reportValidationErrors, getProgramFrom('query'), checkSessionId, (req, res) => {
-
     // Delete the program from the database
     const resp = req.app.db
         .get('programs')

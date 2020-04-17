@@ -1,4 +1,3 @@
-const nanoid = require('nanoid');
 const { checkSchema } = require('express-validator');
 
 const { schema: author } = require('./author');
