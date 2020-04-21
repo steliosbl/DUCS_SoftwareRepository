@@ -40,39 +40,39 @@ const listData = [{
 ];
 
 class SearchBar {
-    constructor () {
+    constructor (element) {
+        this.element = element;
+        this.initialized = false;
         this.Active = false;
         this.innerElements = {
-            searchButton: document.getElementById('search_button'),
-            newButton: document.getElementById('new_button'),
-            searchBox: document.getElementById('search_box'),
-            spacer: document.getElementById('search_bar_spacer'),
-            buttons: document.getElementById('search_bar_buttons')
+            searchButton: this.element.querySelector('[data-button-search]'),
+            newButton: this.element.querySelector('[data-button-new]'),
+            searchBox: this.element.querySelector('[data-input-search]'),
+            spacer: this.element.querySelector('[data-spacer]'),
+            buttons: this.element.querySelector('[data-container-buttons]')
         };
-
-        this.initializeListeners();
     }
 
     static fromDefaultElement () {
-        const searchBar = new SearchBar(false);
-        searchBar.element = document.getElementById('search_bar');
-        return searchBar;
-    }
-
-    static fromElement (element) {
-        const searchBar = new SearchBar(false);
-        searchBar.element = element;
-        return searchBar;
+        return new SearchBar(document.getElementById('search_bar'));
     }
 
     withSearchHandler (handler) {
-        this.searchHandler = handler;
-        return this;
+        if (!this.initialized) {
+            this.searchHandler = handler;
+            return this;
+        }
+
+        throw new Error('Cannot add search handler now. The component has already been initialized');
     }
 
     withNewHandler (handler) {
-        this.newHandler = handler;
-        return this;
+        if (!this.initialized) {
+            this.newHandler = handler;
+            return this;
+        }
+
+        throw new Error('Cannot add new handler now. The component has already been initialized');
     }
 
     get Active () {
@@ -80,11 +80,8 @@ class SearchBar {
     }
 
     set Active (a) {
-        if (!this.active && a) {
-            this.activate();
-        }
-
         this.active = a;
+        this.onActiveChanged();
     }
 
     get Value () {
@@ -93,6 +90,16 @@ class SearchBar {
 
     set Value (v) {
         this.innerElements.searchBox.value = v;
+    }
+
+    onActiveChanged () {
+        if (this.Active) {
+            this.element.classList.remove('vertical-center');
+            this.innerElements.spacer.classList.add('d-none');
+            this.innerElements.buttons.classList.remove('mx-auto', 'pt-4');
+            this.innerElements.buttons.classList.add('input-group-append', 'ml-2');
+            this.innerElements.searchBox.classList.remove('rounded');
+        }
     }
 
     initializeListeners () {
@@ -115,119 +122,256 @@ class SearchBar {
             this.newHandler(e);
         };
 
+        this.initialized = true;
         return this;
-    }
-
-    activate () {
-        this.element.classList.remove('vertical-center');
-        this.innerElements.spacer.classList.add('d-none');
-        this.innerElements.buttons.classList.remove('mx-auto', 'pt-4');
-        this.innerElements.buttons.classList.add('input-group-append', 'ml-2');
-        this.innerElements.searchBox.classList.remove('rounded');
     }
 }
 
-class App {
-    constructor () {
-        this.CurrentUser = {
-            id: null,
-            name: null
-        };
-        this.Api = new Api();
-        this.ListData = [];
-        this.components = {
-            searchBar: SearchBar
-                .fromDefaultElement()
-                .withSearchHandler(this.performSearch.bind(this)) // Must bind the handler to the App class
-                .initializeListeners(),
-
-            cardList: CardList
-                .fromDefaultElement()
-                .withDefaultCardPrototype()
-        };
-
-        this.stateFromUrl();
+class Form {
+    constructor (element) {
+        this.element = element;
+        this.initialized = false;
     }
 
-    stateFromUrl () {
-        const urlParams = new URLSearchParams(window.location.search);
+    static fromElement (e) {
+        return new Form(e);
+    }
 
-        if (window.location.pathname === '/search') {
-            const searchValue = urlParams.get('q');
-            this.components.searchBar.Active = true;
-            this.components.searchBar.Value = searchValue;
-            this.performSearch();
+    static fromElementId (id) {
+        return new Form(document.getElementById(id));
+    }
+
+    get PassesValidation () {
+        return this.element.checkValidity();
+    }
+
+    initializeListeners () {
+        this.element.addEventListener('submit', e => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (this.element.checkValidity()) {
+                this.submitHandler(e);
+            }
+
+            this.element.classList.add('was-validated');
+        });
+
+        this.initialized = true;
+        return this;
+    }
+
+    withSubmitHandler (handler) {
+        if (!this.initialized) {
+            this.submitHandler = handler;
+            return this;
+        }
+
+        throw new Error('Cannot add submit handler now. The form has already been initialized');
+    }
+
+    reset () {
+        this.element.reset();
+        return this;
+    }
+}
+
+class LoginForm extends Form {
+    constructor (element) {
+        super(element);
+        this.innerElements = {
+            nameContainer: this.element.querySelector('[data-name-container]'),
+            emailInput: this.element.querySelector('[data-input="email"]'),
+            nameInput: this.element.querySelector('[data-input="name"]')
+        };
+    }
+
+    static fromDefaultElement () {
+        return new LoginForm(document.getElementById('login_form'));
+    }
+
+    get Email () {
+        return this.innerElements.emailInput.value;
+    }
+
+    get Name () {
+        return this.innerElements.nameInput.value;
+    }
+
+    requestName () {
+        this.innerElements.nameInput.value = '';
+        this.innerElements.emailInput.setAttribute('readonly', '');
+        this.innerElements.nameInput.setAttribute('required', '');
+        this.innerElements.nameContainer.classList.remove('d-none');
+    }
+}
+
+class Modal {
+    constructor (element) {
+        this.element = element;
+        this.Visible = false;
+    }
+
+    static fromElement (element) {
+        return new Modal(element);
+    }
+
+    static fromElementId (id) {
+        return new Modal(document.getElementById(id));
+    }
+
+    withSubmitHandler (handler) {
+        this.submitHandler = handler;
+        return this;
+    }
+
+    initializeListeners () {
+        this.element.querySelector('.modal-footer .btn-primary').onclick(e => {
+            this.submitHandler(e);
+        });
+        return this;
+    }
+
+    modal (args) {
+        // Evil JQuery but it wouldn't work otherwise
+        return $(this.element).modal(args);
+    }
+
+    show () {
+        this.modal('show');
+        return this;
+    }
+
+    hide () {
+        this.modal('hide');
+        this.element.querySelectorAll('form')
+            .forEach(form => form.reset());
+        return this;
+    }
+
+    get Visible () {
+        return this.element === document.activeElement;
+    }
+
+    set Visible (v) {
+        if (v) {
+            this.show();
+        } else {
+            this.hide();
         }
     }
+}
 
-    get IsLoggedIn () {
-        return Boolean(this.currentUser.id);
+class LoginModal extends Modal {
+    constructor (element) {
+        super(element);
+        this.Registration = false;
+        this.Form = LoginForm
+            .fromDefaultElement()
+            .withSubmitHandler(this.handleFormSubmission.bind(this))
+            .initializeListeners();
     }
 
-    get HasSearched () {
-        return this.hasSearched;
+    static fromDefaultElement () {
+        return new LoginModal(document.getElementById('login_modal'));
     }
 
-    set HasSearched (h) {
-        this.hasSearched = h;
+    withLoginHandler (handler) {
+        this.loginHandler = handler;
+        return this;
     }
 
-    get CurrentUser () {
-        return this.currentUser;
+    withRegistrationHandler (handler) {
+        this.registrationHandler = handler;
+        return this;
     }
 
-    set CurrentUser (c) {
-        this.currentUser = c;
+    get Registration () {
+        return this.registration;
     }
 
-    get ListData () {
-        return this.listData;
+    set Registration (r) {
+        if (r) {
+            this.Form.requestName();
+        }
+
+        this.registration = r;
     }
 
-    set ListData (l) {
-        this.listData = l;
+    handleFormSubmission () {
+        const email = this.Form.Email;
+        const name = this.Form.Name;
+
+        // If the user has already been prompted to register
+        if (this.Registration) {
+            // and registration handler exists
+            if (this.registrationHandler) {
+                // Invoke it
+                this.registrationHandler(email, name);
+                this.hide();
+            } else {
+                // Otherwise the programmer has forgotten to pass one to the modal
+                throw new Error('There is no registrationHandler to invoke. Have you called LoginModal.withRegistrationHandler?');
+            }
+            // If the user has not been prompted to register
+        } else {
+            // and login handler exists
+            if (this.loginHandler) {
+                // and the login was successful
+                if (this.loginHandler(email)) {
+                    // Close the modal
+                    this.hide();
+                } else {
+                    // Otherwise, prompt the user to register
+                    this.Registration = true;
+                }
+            } else {
+                // Otherwise the programmer has forgotten to pass one to the modal
+                throw new Error('There is no loginHandler to invoke. Have you called LoginModal.withLoginHandler?');
+            }
+        }
+    }
+}
+
+class UserButton {
+    constructor (element) {
+        this.element = element;
+        this.innerElements = {
+            userName: this.element.querySelector('[data-user-name]')
+        };
     }
 
-    initialize () {
-
+    static fromDefaultElement () {
+        return new UserButton(document.getElementById('user_button'));
     }
 
-    displayData () {
-        this.components.cardList.displayCardsFromData(this.ListData);
+    withClickHandler (handler) {
+        this.element.addEventListener('click', handler);
+        return this;
     }
 
-    performSearch () {
-        const value = this.components.searchBar.Value;
+    get Name () {
+        return this.innerElements.userName.innerText;
+    }
 
-        this.HasSearched = true;
-        window.history.pushState({
-            hasSearched: true
-        }, 'Search Results', '/search?q=' + value)
-        this.ListData = this.Api.searchPrograms(value);
-        this.displayData();
+    set Name (n) {
+        if (n) {
+            this.innerElements.userName.innerText = n;
+            this.innerElements.userName.classList.add('logged_in');
+        } else {
+            this.innerElements.userName.innerText = 'Stranger';
+            this.innerElements.userName.classList.remove('logged_in');
+        }
     }
 }
 
 class CardList {
-    constructor () {
+    constructor (element) {
+        this.element = element;
         this.cards = [];
     }
 
-    static fromElement (element) {
-        const cardList = new CardList();
-        cardList.element = element;
-        return cardList;
-    }
-
     static fromDefaultElement () {
-        const cardList = new CardList();
-        cardList.element = document.getElementById('card_container');
-        return cardList;
-    }
-
-    withCardPrototype (prototype) {
-        this.cardPrototype = prototype;
-        return this;
+        return new CardList(document.getElementById('card_container'));
     }
 
     withDefaultCardPrototype () {
@@ -250,18 +394,18 @@ class CardList {
     }
 
     addCard (data) {
-        // Create new card using given prototype and data
-        // Then append it to the card-container
-        // Finally, display it
-        const newCard = Card
-            .fromPrototype(this.cardPrototype)
-            .withData(data)
-            .build()
-            .appendTo(this.element)
-            .show();
+        if (this.cardPrototype) {
+            const newCard = Card
+                .fromPrototype(this.cardPrototype)
+                .withData(data)
+                .build()
+                .appendTo(this.element)
+                .show();
 
-        // Add the new card to the list of cards DOM element
-        this.cards.push(newCard);
+            this.cards.push(newCard);
+        } else {
+            throw new Error('Cannot add new card. No card prototype exists. Have you called withCardPrototype?');
+        }
     }
 }
 
@@ -320,6 +464,132 @@ class Card {
     }
 };
 
+class App {
+    constructor () {
+        this.currentUser = {
+            email: null,
+            name: null
+        };
+        this.Api = new Api();
+        this.ListData = [];
+        this.components = {
+            searchBar: SearchBar
+                .fromDefaultElement()
+                .withSearchHandler(this.performSearch.bind(this)) // Must bind the handler to the App class
+                .initializeListeners(),
+
+            cardList: CardList
+                .fromDefaultElement()
+                .withDefaultCardPrototype(),
+
+            userButton: UserButton
+                .fromDefaultElement()
+                .withClickHandler(this.userButtonClickHandler.bind(this)),
+
+            loginModal: LoginModal
+                .fromDefaultElement()
+                .withLoginHandler(this.login.bind(this))
+                .withRegistrationHandler(this.register.bind(this))
+        };
+        this.stateFromUrl();
+    }
+
+    stateFromUrl () {
+        const urlParams = new URLSearchParams(window.location.search);
+
+        if (window.location.pathname === '/search') {
+            const searchValue = urlParams.get('q');
+            this.components.searchBar.Active = true;
+            this.components.searchBar.Value = searchValue;
+            this.performSearch();
+        }
+    }
+
+    get IsLoggedIn () {
+        return Boolean(this.currentUser.email);
+    }
+
+    get HasSearched () {
+        return this.hasSearched;
+    }
+
+    set HasSearched (h) {
+        this.hasSearched = h;
+    }
+
+    get CurrentUser () {
+        return this.currentUser;
+    }
+
+    set CurrentUser (c) {
+        this.currentUser = c;
+        this.onCurrentUserChanged();
+    }
+
+    get ListData () {
+        return this.listData;
+    }
+
+    set ListData (l) {
+        this.listData = l;
+    }
+
+    initialize () {
+
+    }
+
+    onCurrentUserChanged () {
+        this.components.userButton.Name = this.CurrentUser.name;
+    }
+
+    displayData () {
+        this.components.cardList.displayCardsFromData(this.ListData);
+    }
+
+    performSearch () {
+        const value = this.components.searchBar.Value;
+
+        this.HasSearched = true;
+        window.history.pushState({
+            hasSearched: true
+        }, 'Search Results', '/search?q=' + value);
+        this.ListData = this.Api.searchPrograms(value);
+        this.displayData();
+    }
+
+    login (email) {
+        if (this.Api.authorExists(email)) {
+            const user = this.Api.getAuthor(email);
+            if (user) {
+                this.CurrentUser = user;
+                return true;
+            }
+
+            throw new Error('Failed to log in');
+        }
+
+        return false;
+    }
+
+    register (email, name) {
+        if (!this.Api.authorExists(email)) {
+            if (this.Api.register(email, name)) {
+                this.login(email);
+            } else {
+                throw new Error('Failed to register user');
+            }
+        } else {
+            throw new Error('User already exists. Why were they prompted to register?');
+        }
+    }
+
+    userButtonClickHandler () {
+        if (!this.IsLoggedIn) {
+            this.components.loginModal.show();
+        }
+    }
+}
+
 class Api {
     constructor (address) {
         if (address) {
@@ -331,6 +601,21 @@ class Api {
 
     searchPrograms (searchTerms) {
         return listData;
+    }
+
+    authorExists (email) {
+        return email === 'real@test.com';
+    }
+
+    getAuthor (email) {
+        return {
+            email: 'real@test.com',
+            name: 'testy testerson'
+        };
+    }
+
+    register (email, name) {
+        return true;
     }
 }
 
