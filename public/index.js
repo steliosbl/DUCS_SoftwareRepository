@@ -1,5 +1,5 @@
 /**
- * Valid Author format
+ * Valid Author/User format
  * @typedef {Object} Author
  * @property {string} id The unique Id of the Author (should be their email)
  * @property {string} name The Author's name
@@ -14,6 +14,13 @@
  * @property {Date} creationDate The date the program was created on
  * @property {Date} modificationDate The date of the last time the program was modified
  */
+
+class RuntimeError extends Error {
+    constructor (message) {
+        super(message);
+        this.Display = true;
+    }
+}
 
 const listData = [{
         id: 'aaaaaa',
@@ -39,6 +46,23 @@ const listData = [{
     }
 ];
 
+class LoadingSpinner {
+    constructor (element) {
+        this.element = element;
+    }
+
+    static fromParent (parent) {
+        return new LoadingSpinner(parent.querySelector('[data-loading]'));
+    }
+
+    show () {
+        this.element.classList.remove('d-none');
+    }
+
+    hide () {
+        this.element.classList.add('d-none');
+    }
+}
 class SearchBar {
     constructor (element) {
         this.element = element;
@@ -145,6 +169,18 @@ class Form {
         return this.element.checkValidity();
     }
 
+    get DisplayValidation () {
+        return this.element.classList.contains('was-validated');
+    }
+
+    set DisplayValidation (v) {
+        if (v) {
+            this.element.classList.add('was-validated');
+        } else {
+            this.element.classList.remove('was-validated');
+        }
+    }
+
     initializeListeners () {
         this.element.addEventListener('submit', e => {
             e.preventDefault();
@@ -153,7 +189,7 @@ class Form {
                 this.submitHandler(e);
             }
 
-            this.element.classList.add('was-validated');
+            this.DisplayValidation = true;
         });
 
         this.initialized = true;
@@ -171,6 +207,7 @@ class Form {
 
     reset () {
         this.element.reset();
+        this.DisplayValidation = false;
         return this;
     }
 }
@@ -198,10 +235,19 @@ class LoginForm extends Form {
     }
 
     requestName () {
-        this.innerElements.nameInput.value = '';
+        this.DisplayValidation = false;
         this.innerElements.emailInput.setAttribute('readonly', '');
         this.innerElements.nameInput.setAttribute('required', '');
         this.innerElements.nameContainer.classList.remove('d-none');
+        return this;
+    }
+
+    reset () {
+        super.reset();
+        this.innerElements.emailInput.removeAttribute('readonly');
+        this.innerElements.nameInput.removeAttribute('required');
+        this.innerElements.nameContainer.classList.add('d-none');
+        return this;
     }
 }
 
@@ -265,6 +311,8 @@ class LoginModal extends Modal {
     constructor (element) {
         super(element);
         this.Registration = false;
+        this.Loading = LoadingSpinner
+            .fromParent(this.element);
         this.Form = LoginForm
             .fromDefaultElement()
             .withSubmitHandler(this.handleFormSubmission.bind(this))
@@ -290,45 +338,61 @@ class LoginModal extends Modal {
     }
 
     set Registration (r) {
-        if (r) {
-            this.Form.requestName();
-        }
-
         this.registration = r;
+        this.onRegistrationChange();
     }
 
     handleFormSubmission () {
-        const email = this.Form.Email;
-        const name = this.Form.Name;
+        this.Loading.show();
+        const promise = this.Registration
+            ? this.register()
+            : this.login();
 
-        // If the user has already been prompted to register
-        if (this.Registration) {
-            // and registration handler exists
-            if (this.registrationHandler) {
-                // Invoke it
-                this.registrationHandler(email, name);
+        promise
+            .catch(err => {
                 this.hide();
-            } else {
-                // Otherwise the programmer has forgotten to pass one to the modal
-                throw new Error('There is no registrationHandler to invoke. Have you called LoginModal.withRegistrationHandler?');
-            }
-            // If the user has not been prompted to register
+                throw err;
+            }).finally(() => {
+                this.Loading.hide();
+            });
+    }
+
+    register () {
+        if (this.registrationHandler) {
+            return this.registrationHandler(this.Form.email, this.Form.name)
+                .then(() => {
+                    this.reset();
+                });
         } else {
-            // and login handler exists
-            if (this.loginHandler) {
-                // and the login was successful
-                if (this.loginHandler(email)) {
-                    // Close the modal
-                    this.hide();
-                } else {
-                    // Otherwise, prompt the user to register
-                    this.Registration = true;
-                }
-            } else {
-                // Otherwise the programmer has forgotten to pass one to the modal
-                throw new Error('There is no loginHandler to invoke. Have you called LoginModal.withLoginHandler?');
-            }
+            throw new Error('There is no registrationHandler to invoke. Have you called LoginModal.withRegistrationHandler?');
         }
+    }
+
+    login () {
+        if (this.loginHandler) {
+            return this.loginHandler(this.Form.Email)
+                .then(res => {
+                    if (res) {
+                        this.reset();
+                    } else {
+                        this.Registration = true;
+                    }
+                });
+        } else {
+            throw new Error('There is no loginHandler to invoke. Have you called LoginModal.withLoginHandler?');
+        }
+    }
+
+    onRegistrationChange () {
+        if (this.Registration) {
+            this.Form.requestName();
+        }
+    }
+
+    reset () {
+        this.hide();
+        this.Registration = false;
+        this.Form.reset();
     }
 }
 
@@ -356,10 +420,10 @@ class UserButton {
     set Name (n) {
         if (n) {
             this.innerElements.userName.innerText = n;
-            this.innerElements.userName.classList.add('logged_in');
+            this.innerElements.userName.classList.add('text-success');
         } else {
             this.innerElements.userName.innerText = 'Stranger';
-            this.innerElements.userName.classList.remove('logged_in');
+            this.innerElements.userName.classList.remove('text-success');
         }
     }
 }
@@ -367,6 +431,9 @@ class UserButton {
 class CardList {
     constructor (element) {
         this.element = element;
+        this.Loading = LoadingSpinner
+            .fromParent(this.element);
+
         this.cards = [];
     }
 
@@ -379,9 +446,15 @@ class CardList {
         return this;
     }
 
-    displayCardsFromData (data) {
+    async display (dataPromise) {
         this.clearAllCards();
-        data.forEach(item => this.addCard(item));
+        this.Loading.show();
+        dataPromise.then(data => {
+            data.forEach(item => this.addCard(item));
+        }).finally(() => {
+            this.Loading.hide();
+        });
+
         return this;
     }
 
@@ -467,15 +540,15 @@ class Card {
 class App {
     constructor () {
         this.currentUser = {
-            email: null,
+            id: null,
             name: null
         };
-        this.Api = new Api();
         this.ListData = [];
+        this.Api = new Api();
         this.components = {
             searchBar: SearchBar
                 .fromDefaultElement()
-                .withSearchHandler(this.performSearch.bind(this)) // Must bind the handler to the App class
+                .withSearchHandler(this.search.bind(this)) // Must bind the handler to the App class
                 .initializeListeners(),
 
             cardList: CardList
@@ -484,7 +557,7 @@ class App {
 
             userButton: UserButton
                 .fromDefaultElement()
-                .withClickHandler(this.userButtonClickHandler.bind(this)),
+                .withClickHandler(this.handleUserButtonClick.bind(this)),
 
             loginModal: LoginModal
                 .fromDefaultElement()
@@ -501,12 +574,12 @@ class App {
             const searchValue = urlParams.get('q');
             this.components.searchBar.Active = true;
             this.components.searchBar.Value = searchValue;
-            this.performSearch();
+            this.search();
         }
     }
 
     get IsLoggedIn () {
-        return Boolean(this.currentUser.email);
+        return Boolean(this.currentUser.id);
     }
 
     get HasSearched () {
@@ -542,51 +615,44 @@ class App {
         this.components.userButton.Name = this.CurrentUser.name;
     }
 
-    displayData () {
-        this.components.cardList.displayCardsFromData(this.ListData);
-    }
-
-    performSearch () {
+    search () {
         const value = this.components.searchBar.Value;
 
         this.HasSearched = true;
         window.history.pushState({
             hasSearched: true
         }, 'Search Results', '/search?q=' + value);
-        this.ListData = this.Api.searchPrograms(value);
-        this.displayData();
+
+        const dataPromise = this.Api.searchPrograms(value);
+
+        this.components.cardList.display(dataPromise);
     }
 
-    login (email) {
-        if (this.Api.authorExists(email)) {
-            const user = this.Api.getAuthor(email);
+    login (id) {
+        return this.Api.getAuthor(id).then(user => {
             if (user) {
                 this.CurrentUser = user;
                 return true;
             }
 
-            throw new Error('Failed to log in');
-        }
-
-        return false;
+            return false;
+        });
     }
 
-    register (email, name) {
-        if (!this.Api.authorExists(email)) {
-            if (this.Api.register(email, name)) {
-                this.login(email);
-            } else {
-                throw new Error('Failed to register user');
-            }
-        } else {
-            throw new Error('User already exists. Why were they prompted to register?');
-        }
+    register (id, name) {
+        return this.Api.register(id, name).then(async () => {
+            await this.login(id);
+        });
     }
 
-    userButtonClickHandler () {
+    handleUserButtonClick () {
         if (!this.IsLoggedIn) {
             this.components.loginModal.show();
         }
+    }
+
+    handleRuntimeError (msg) {
+
     }
 }
 
@@ -599,22 +665,21 @@ class Api {
         }
     }
 
-    searchPrograms (searchTerms) {
+    async searchPrograms (searchTerms) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
         return listData;
     }
 
-    authorExists (email) {
-        return email === 'real@test.com';
-    }
-
-    getAuthor (email) {
-        return {
-            email: 'real@test.com',
+    async getAuthor (id) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return id === 'real@test.com' ? {
+            id: 'real@test.com',
             name: 'testy testerson'
-        };
+        } : false;
     }
 
-    register (email, name) {
+    async register (id, name) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
         return true;
     }
 }

@@ -6,12 +6,9 @@ nav {
     background-color: #001427;
 }
 
-#user_button span {
-    color:#11125b;
-}
-
-#user_button span.logged_in {
-    color:#3cd300;
+section#card_container .spinner-border{
+    width:5rem;
+    height:5rem;
 }
 
 .vertical-center {
