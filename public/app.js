@@ -43,9 +43,11 @@ export default class App {
 
         if (window.location.pathname === '/search') {
             const searchValue = urlParams.get('q');
-            this.components.searchBar.Active = true;
-            this.components.searchBar.Value = searchValue;
-            this.search();
+            if (searchValue) {
+                this.components.searchBar.Active = true;
+                this.components.searchBar.Value = searchValue;
+                this.search();
+            }
         }
     }
 

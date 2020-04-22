@@ -65,15 +65,19 @@ export class SearchBar {
         this.innerElements.searchBox.addEventListener('keyup', e => {
             if (e.keyCode === 13) {
                 e.preventDefault();
-                this.Active = true;
-                this.searchHandler(e);
+                if (this.Value) {
+                    this.Active = true;
+                    this.searchHandler(e);
+                }
             }
         });
 
         this.innerElements.searchButton.onclick = e => {
             e.preventDefault();
-            this.Active = true;
-            this.searchHandler(e);
+            if (this.Value) {
+                this.Active = true;
+                this.searchHandler(e);
+            }
         };
 
         this.innerElements.newButton.onclick = e => {
