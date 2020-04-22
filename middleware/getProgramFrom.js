@@ -12,6 +12,8 @@ module.exports = function (location) {
             id = req.query.id;
         } else if (location === 'body') {
             id = req.body.id;
+        } else if (location === 'params') {
+            id = req.params.id;
         } else {
             throw new Error('Cannot get program from {0}. Must be either "query" or "body"'.format(location));
         }

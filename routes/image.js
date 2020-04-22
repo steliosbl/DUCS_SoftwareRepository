@@ -27,6 +27,13 @@ imageRouter.use(express.static(path.join(__dirname, '../.data/static/images'), {
     extensions: ['png']
 }));
 
+imageRouter.get('/:id', validate.GET, reportValidationErrors, getProgramFrom('params'), (req, res) => {
+    res.status(HttpStatus.OK)
+    .sendFile('placeholder.svg', {
+      root: path.join(__dirname, '../public/assets')
+    });
+});
+
 // POST at root path
 // Request body is validated before being processed
 imageRouter.post('/', validate.POST, reportValidationErrors, getProgramFrom('body'), checkSessionId, (req, res) => {

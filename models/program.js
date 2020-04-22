@@ -5,7 +5,7 @@ const { schema: author } = require('./author');
 // Validation model for Program objects
 const schema = {
     id: {
-        in: ['body', 'query'], // Id is expected to be either in the query string or the request body
+        in: ['body', 'query', 'params'], // Id is expected to be either in the query string or the request body or the params
         escape: true, // It will be escaped and trimmed
         trim: true,
         matches: {

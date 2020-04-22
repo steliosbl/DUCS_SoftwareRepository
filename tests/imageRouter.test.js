@@ -140,11 +140,27 @@ describe('Test imageRouter', () => {
     it('Responds to GET with error 404-Not Found if not given an Id', async () => {
         await request.get('/image/')
             .expect(404);
-    })
+    });
 
     it('Responds to GET with error 404-Not Found if given a fake Id', async () => {
-        await request.get('/image/fake')
+        await request.get('/image/' + defaults.programId)
             .expect(404);
+    });
+
+    it('Responds to GET with error 422-Unprocessable Entity if given an Id that could not exist', async () => {
+        await request.get('/image/fake_id')
+            .expect(422);
+    });
+
+    it('Responds to GET with 200-Ok if given an Id that corresponds to a program without an image', async () => {
+        await createAuthor()
+        .expect(201);
+
+        const id = (await createProgram()
+            .expect(201)).body.id;
+
+        await request.get('/image/' + id)
+            .expect(200);
     })
 
     it('Responds to GET with 200-Ok if given an Id that corresponds to an existing image', async () => {

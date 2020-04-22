@@ -90,7 +90,7 @@ describe('Test authorRouter', () => {
     });
 
     it('Responds to GET with error 404-Not Found if given an Id that doesnt exist', async () => {
-        return await request.get('/author/fake_id@example.com')
+        return await request.get('/author/' + defaults.authorId)
             .expect(404);
     });
 
