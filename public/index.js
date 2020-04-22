@@ -3,6 +3,8 @@
  * @typedef {Object} Author
  * @property {string} id The unique Id of the Author (should be their email)
  * @property {string} name The Author's name
+ * @property {date} registrationDate The date the Author was registered
+ * @property {date} loginDate The date of the Author's last login
  */
 /**
  * Valid Program format
@@ -251,6 +253,70 @@ class LoginForm extends Form {
     }
 }
 
+class ProfileForm extends Form {
+    constructor (element) {
+        super(element);
+        this.innerElements = {
+            emailInput: this.element.querySelector('[data-input="email"]'),
+            nameInput: this.element.querySelector('[data-input="name"]'),
+            submitButton: this.element.querySelector('button[type="submit"]')
+        };
+    }
+
+    static fromDefaultElement () {
+        return new ProfileForm(document.getElementById('profile_form'));
+    }
+
+    withUserData (userObject) {
+        this.Email = userObject.id;
+        this.Name = userObject.name;
+        return this;
+    }
+
+    get Email () {
+        return this.innerElements.emailInput.value;
+    }
+
+    set Email (e) {
+        this.innerElements.emailInput.value = e;
+    }
+
+    get Name () {
+        return this.innerElements.nameInput.value;
+    }
+
+    set Name (n) {
+        this.innerElements.nameInput.value = n;
+    }
+
+    get SubmitButtonVisible () {
+        return !this.innerElements.submitButton.classList.contains('d-none');
+    }
+
+    set SubmitButtonVisible (v) {
+        if (v) {
+            this.innerElements.submitButton.classList.remove('d-none');
+        } else {
+            this.innerElements.submitButton.classList.add('d-none');
+        }
+    }
+
+    initializeListeners () {
+        super.initializeListeners();
+
+        this.innerElements.submitButton.addEventListener('input', e => {
+            this.SubmitButtonVisible = true;
+        });
+
+        return this;
+    }
+
+    reset () {
+        super.reset();
+        this.SubmitButtonVisible = false;
+    }
+}
+
 class Modal {
     constructor (element) {
         this.element = element;
@@ -289,8 +355,6 @@ class Modal {
 
     hide () {
         this.modal('hide');
-        this.element.querySelectorAll('form')
-            .forEach(form => form.reset());
         return this;
     }
 
@@ -396,6 +460,72 @@ class LoginModal extends Modal {
     }
 }
 
+class ProfileModal extends Modal {
+    constructor (element) {
+        super(element);
+        this.Loading = LoadingSpinner
+            .fromParent(this.element);
+        this.Form = ProfileForm
+            .fromDefaultElement()
+            .withSubmitHandler(this.handleFormSubmission.bind(this))
+            .initializeListeners();
+        this.innerElements = {
+            registrationDate: this.element.querySelector('[data-registration-date]'),
+            loginDate: this.element.querySelector('[data-login-date]')
+        };
+    }
+
+    static fromDefaultElement () {
+        return new ProfileModal(document.getElementById('user_modal'));
+    }
+
+    set RegistrationDate (d) {
+        this.innerElements.registrationDate.innerText = d;
+    }
+
+    set LoginDate (d) {
+        this.innerElements.loginDate.innerText = d;
+    }
+
+    withProfileEditHandler (handler) {
+        this.profileEditHandler = handler;
+        return this;
+    }
+
+    withUserData (userObject) {
+        this.Form.withUserData(userObject);
+        this.RegistrationDate = userObject.registrationDate;
+        this.LoginDate = userObject.loginDate;
+    }
+
+    handleFormSubmission () {
+        this.Loading.show();
+        if (this.profileEditHandler) {
+            this.profileEditHandler(this.Form.Name)
+                .then(() => {
+                    this.hide();
+                    this.Form.DisplayValidation = false;
+                })
+                .catch(err => {
+                    this.hide();
+                    throw err;
+                })
+                .finally(() => {
+                    this.Loading.hide();
+                });
+        } else {
+            throw new Error('There is no profileEditHandler to invoke. Have you called withProfileEditHandler?')
+        }
+    }
+
+    reset () {
+        this.hide();
+        this.Form.reset();
+        this.RegistrationDate = '{date}';
+        this.LoginDate = '{date}';
+    }
+}
+
 class UserButton {
     constructor (element) {
         this.element = element;
@@ -486,11 +616,11 @@ class Card {
     constructor (element) {
         this.element = element;
         this.innerElements = {
-            title: this.element.querySelector('.data-title'),
-            description: this.element.querySelector('.data-description'),
-            author: this.element.querySelector('.data-author'),
-            modificationDate: this.element.querySelector('.data-modification-date'),
-            creationDate: this.element.querySelector('.data-creation-date')
+            title: this.element.querySelector('[data-card-title]'),
+            description: this.element.querySelector('[data-card-description]'),
+            author: this.element.querySelector('[data-card-author]'),
+            modificationDate: this.element.querySelector('[data-card-modification-date]'),
+            creationDate: this.element.querySelector('[data-card-creation-date]')
         };
     }
 
@@ -539,10 +669,6 @@ class Card {
 
 class App {
     constructor () {
-        this.currentUser = {
-            id: null,
-            name: null
-        };
         this.ListData = [];
         this.Api = new Api();
         this.components = {
@@ -562,9 +688,19 @@ class App {
             loginModal: LoginModal
                 .fromDefaultElement()
                 .withLoginHandler(this.login.bind(this))
-                .withRegistrationHandler(this.register.bind(this))
+                .withRegistrationHandler(this.register.bind(this)),
+
+            profileModal: ProfileModal
+                .fromDefaultElement()
+                .withProfileEditHandler(this.editUser.bind(this))
         };
         this.stateFromUrl();
+        this.CurrentUser = {
+            id: 'real@test.com',
+            name: 'testy testerson',
+            registrationDate: 'a date',
+            loginDate: 'today'
+        };
     }
 
     stateFromUrl () {
@@ -613,6 +749,8 @@ class App {
 
     onCurrentUserChanged () {
         this.components.userButton.Name = this.CurrentUser.name;
+        this.components.profileModal
+            .withUserData(this.CurrentUser);
     }
 
     search () {
@@ -645,8 +783,17 @@ class App {
         });
     }
 
+    editUser (name) {
+        return this.Api.editAuthor(this.CurrentUser.id, name)
+            .then(async res => {
+               this.CurrentUser = res;
+            });
+    }
+
     handleUserButtonClick () {
-        if (!this.IsLoggedIn) {
+        if (this.IsLoggedIn) {
+            this.components.profileModal.show();
+        } else {
             this.components.loginModal.show();
         }
     }
@@ -674,8 +821,20 @@ class Api {
         await new Promise(resolve => setTimeout(resolve, 1000));
         return id === 'real@test.com' ? {
             id: 'real@test.com',
-            name: 'testy testerson'
+            name: 'testy testerson',
+            registrationDate: 'a date',
+            loginDate: 'today'
         } : false;
+    }
+
+    async editAuthor (id, name) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return {
+            id: id,
+            name: name,
+            registrationDate: 'another date',
+            loginDate: 'today'
+        };
     }
 
     async register (id, name) {
