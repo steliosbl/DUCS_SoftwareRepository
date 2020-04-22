@@ -96,9 +96,11 @@
                                         </div>
                                     </div>
                                 </div>
-                                <button class="btn btn-primary float-right" type="submit"><div data-loading
-                                    class="spinner-border spinner-border-sm text-white d-none" role="status">
-                                </div>Submit</button>
+                                <button class="btn btn-primary float-right" type="submit">
+                                    <div data-loading class="spinner-border spinner-border-sm text-white d-none"
+                                        role="status">
+                                    </div>Submit
+                                </button>
                             </form>
                         </div>
                     </div>
@@ -182,7 +184,11 @@
         integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous">
     </script>
     <!-- Client Script -->
-    <script src="index.js" defer></script>
+    <script type="module" defer>
+        import App from './app.js'
+        const app = new App();
+        app.initialize();
+    </script>
 </body>
 
 </html>
