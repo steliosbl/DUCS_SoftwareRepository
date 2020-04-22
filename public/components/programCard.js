@@ -6,7 +6,9 @@ export default class ProgramCard {
             description: this.element.querySelector('[data-card-description]'),
             author: this.element.querySelector('[data-card-author]'),
             modificationDate: this.element.querySelector('[data-card-modification-date]'),
-            creationDate: this.element.querySelector('[data-card-creation-date]')
+            creationDate: this.element.querySelector('[data-card-creation-date]'),
+            id: this.element.querySelector('[data-card-id]'),
+            image: this.element.querySelector('[data-card-img]')
         };
     }
 
@@ -18,7 +20,6 @@ export default class ProgramCard {
 
     withData (d) {
         this.data = d;
-
         return this;
     }
 
@@ -35,16 +36,14 @@ export default class ProgramCard {
         this.innerElements.author.innerText = this.data.author.name;
         this.innerElements.modificationDate.innerText = this.data.modificationDate;
         this.innerElements.creationDate.innerText = this.data.creationDate;
+        this.innerElements.id.innerText = this.data.id;
+        this.innerElements.image.src = '/image/' + this.data.id;
         return this;
     }
 
     appendTo (elem) {
         elem.appendChild(this.element);
         return this;
-    }
-
-    get Element () {
-        return this.element;
     }
 
     show () {

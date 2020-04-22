@@ -13,8 +13,12 @@ export class ProfileModal extends Modal {
             .initializeListeners();
         this.innerElements = {
             registrationDate: this.element.querySelector('[data-registration-date]'),
-            loginDate: this.element.querySelector('[data-login-date]')
+            loginDate: this.element.querySelector('[data-login-date]'),
+            logoutButton: this.element.querySelector('button[type="logout"]')
         };
+        this.withLogoutHandler(e => {
+            this.hide();
+        });
     }
 
     static fromDefaultElement () {
@@ -31,6 +35,15 @@ export class ProfileModal extends Modal {
 
     withProfileEditHandler (handler) {
         this.profileEditHandler = handler;
+        return this;
+    }
+
+    withLogoutHandler (handler) {
+        this.innerElements.logoutButton.addEventListener('click', e => {
+            e.preventDefault();
+            e.stopPropagation();
+            handler(e);
+        });
         return this;
     }
 
@@ -65,5 +78,6 @@ export class ProfileModal extends Modal {
         this.Form.reset();
         this.RegistrationDate = '{date}';
         this.LoginDate = '{date}';
+        return this;
     }
 };

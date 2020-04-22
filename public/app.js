@@ -4,6 +4,12 @@ import { ProfileModal, LoginModal } from './components/modals/index.js';
 
 export default class App {
     constructor () {
+        this.currentUser = {
+            id: null,
+            name: null,
+            registrationDate: null,
+            loginDate: null
+        }
         this.ListData = [];
         this.Api = new Api();
         this.components = {
@@ -28,6 +34,7 @@ export default class App {
             profileModal: ProfileModal
                 .fromDefaultElement()
                 .withProfileEditHandler(this.editUser.bind(this))
+                .withLogoutHandler(this.logout.bind(this))
         };
         this.stateFromUrl();
         this.CurrentUser = {
@@ -52,7 +59,7 @@ export default class App {
     }
 
     get IsLoggedIn () {
-        return Boolean(this.currentUser.id);
+        return Boolean(this.CurrentUser.id);
     }
 
     get HasSearched () {
@@ -112,6 +119,15 @@ export default class App {
 
             return false;
         });
+    }
+
+    logout () {
+        this.CurrentUser = {
+            id: null,
+            name: null,
+            registrationDate: null,
+            loginDate: null
+        }
     }
 
     register (id, name) {

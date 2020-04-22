@@ -51,7 +51,7 @@ export default class ProfileForm extends Form {
     initializeListeners () {
         super.initializeListeners();
 
-        this.innerElements.submitButton.addEventListener('input', e => {
+        this.innerElements.nameInput.addEventListener('input', e => {
             this.SubmitButtonVisible = true;
         });
 
