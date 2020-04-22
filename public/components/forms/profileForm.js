@@ -8,6 +8,9 @@ export default class ProfileForm extends Form {
             nameInput: this.element.querySelector('[data-input="name"]'),
             submitButton: this.element.querySelector('button[type="submit"]')
         };
+        this.innerElements.nameInput.addEventListener('input', e => {
+            this.SubmitButtonVisible = true;
+        });
     }
 
     static fromDefaultElement () {
@@ -46,16 +49,6 @@ export default class ProfileForm extends Form {
         } else {
             this.innerElements.submitButton.classList.add('d-none');
         }
-    }
-
-    initializeListeners () {
-        super.initializeListeners();
-
-        this.innerElements.nameInput.addEventListener('input', e => {
-            this.SubmitButtonVisible = true;
-        });
-
-        return this;
     }
 
     reset () {

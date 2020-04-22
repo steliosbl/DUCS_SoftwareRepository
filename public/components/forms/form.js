@@ -28,28 +28,18 @@ export default class Form {
         }
     }
 
-    initializeListeners () {
+    withSubmitHandler (handler) {
         this.element.addEventListener('submit', e => {
             e.preventDefault();
             e.stopPropagation();
             if (this.element.checkValidity()) {
-                this.submitHandler(e);
+               handler(e);
             }
 
             this.DisplayValidation = true;
         });
 
-        this.initialized = true;
         return this;
-    }
-
-    withSubmitHandler (handler) {
-        if (!this.initialized) {
-            this.submitHandler = handler;
-            return this;
-        }
-
-        throw new Error('Cannot add submit handler now. The form has already been initialized');
     }
 
     reset () {

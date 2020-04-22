@@ -9,8 +9,7 @@ export class ProfileModal extends Modal {
             .fromParent(this.element);
         this.Form = ProfileForm
             .fromDefaultElement()
-            .withSubmitHandler(this.handleFormSubmission.bind(this))
-            .initializeListeners();
+            .withSubmitHandler(this.handleFormSubmission.bind(this));
         this.innerElements = {
             registrationDate: this.element.querySelector('[data-registration-date]'),
             loginDate: this.element.querySelector('[data-login-date]'),

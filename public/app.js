@@ -15,8 +15,7 @@ export default class App {
         this.components = {
             searchBar: SearchBar
                 .fromDefaultElement()
-                .withSearchHandler(this.search.bind(this)) // Must bind the handler to the App class
-                .initializeListeners(),
+                .withSearchHandler(this.search.bind(this)),
 
             cardList: ProgramList
                 .fromDefaultElement()

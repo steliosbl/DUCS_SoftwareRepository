@@ -13,13 +13,8 @@ export default class Modal {
     }
 
     withSubmitHandler (handler) {
-        this.submitHandler = handler;
-        return this;
-    }
-
-    initializeListeners () {
-        this.element.querySelector('.modal-footer .btn-primary').onclick(e => {
-            this.submitHandler(e);
+        this.element.querySelector('button[type="submit"]').onclick(e => {
+            handler(e);
         });
         return this;
     }

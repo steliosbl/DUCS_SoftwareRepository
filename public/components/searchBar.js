@@ -17,21 +17,34 @@ export class SearchBar {
     }
 
     withSearchHandler (handler) {
-        if (!this.initialized) {
-            this.searchHandler = handler;
-            return this;
-        }
+        this.innerElements.searchBox.addEventListener('keyup', e => {
+            if (e.keyCode === 13) {
+                e.preventDefault();
+                if (this.Value) {
+                    this.Active = true;
+                    handler(e);
+                }
+            }
+        });
 
-        throw new Error('Cannot add search handler now. The component has already been initialized');
+        this.innerElements.searchButton.onclick = e => {
+            e.preventDefault();
+            if (this.Value) {
+                this.Active = true;
+                handler(e);
+            }
+        };
+
+        return this;
     }
 
     withNewHandler (handler) {
-        if (!this.initialized) {
-            this.newHandler = handler;
-            return this;
-        }
+        this.innerElements.newButton.onclick = e => {
+            e.preventDefault();
+            this.newHandler(e);
+        };
 
-        throw new Error('Cannot add new handler now. The component has already been initialized');
+        return this;
     }
 
     get Active () {
@@ -59,33 +72,5 @@ export class SearchBar {
             this.innerElements.buttons.classList.add('input-group-append', 'ml-2');
             this.innerElements.searchBox.classList.remove('rounded');
         }
-    }
-
-    initializeListeners () {
-        this.innerElements.searchBox.addEventListener('keyup', e => {
-            if (e.keyCode === 13) {
-                e.preventDefault();
-                if (this.Value) {
-                    this.Active = true;
-                    this.searchHandler(e);
-                }
-            }
-        });
-
-        this.innerElements.searchButton.onclick = e => {
-            e.preventDefault();
-            if (this.Value) {
-                this.Active = true;
-                this.searchHandler(e);
-            }
-        };
-
-        this.innerElements.newButton.onclick = e => {
-            e.preventDefault();
-            this.newHandler(e);
-        };
-
-        this.initialized = true;
-        return this;
     }
 }

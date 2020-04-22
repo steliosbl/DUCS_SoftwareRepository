@@ -10,8 +10,7 @@ export class LoginModal extends Modal {
             .fromParent(this.element);
         this.Form = LoginForm
             .fromDefaultElement()
-            .withSubmitHandler(this.handleFormSubmission.bind(this))
-            .initializeListeners();
+            .withSubmitHandler(this.handleFormSubmission.bind(this));
     }
 
     static fromDefaultElement () {
