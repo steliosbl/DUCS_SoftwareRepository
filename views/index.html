@@ -28,15 +28,15 @@
                 <div class="modal-header">
                     <h5 class="modal-title">Please Log In</h5>
                     <button type="button" class="close" data-dismiss="modal">
-                        <span aria-hidden="true">&times;</span>
+                        <span>&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <form id="login_form" novalidate>
                         <div class="form-row">
                             <div class="col-12 mb-3">
-                                <input type="email" class="form-control" data-input='email'
-                                    placeholder="Enter email..." required>
+                                <input type="email" class="form-control" data-input='email' placeholder="Enter email..."
+                                    required>
                                 <div class="invalid-feedback">
                                     Are you 100% sure that is an email?
                                 </div>
@@ -45,8 +45,7 @@
                         <div class="form-row d-none" data-name-container>
                             <div class="col-12 mb-3">
                                 <label>Haven't seen you around before. What is your name?</label>
-                                <input type="text" class="form-control" data-input='name'
-                                    placeholder="Enter name...">
+                                <input type="text" class="form-control" data-input='name' placeholder="Enter name...">
                                 <div class="invalid-feedback">
                                     Doesn't look like any name I've seen before. Try harder
                                 </div>
@@ -66,7 +65,7 @@
                 <div class="modal-header">
                     <h5 class="modal-title">User Profile</h5>
                     <button type="button" class="close" data-dismiss="modal">
-                        <span aria-hidden="true">&times;</span>
+                        <span>&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
@@ -128,7 +127,7 @@
                 <div class="modal-header">
                     <h5 class="modal-title">Program Overview</h5>
                     <button type="button" class="close" data-dismiss="modal">
-                        <span aria-hidden="true">&times;</span>
+                        <span>&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
@@ -152,17 +151,19 @@
                             </div>
                             <div class="form-row mb-4">
                                 <div class="col-12">
-                                    <textarea data-input="description" placeholder="Enter description..." class="form-control form-control-lg"
-                                        rows="3"></textarea>
+                                    <textarea data-input="description" placeholder="Enter description..."
+                                        class="form-control form-control-lg" rows="3"></textarea>
                                 </div>
                             </div>
                             <div class="form-row mb-4">
                                 <div class="col-12">
                                     <div class="custom-file">
                                         <input type="file" class="custom-file-input" data-input="image">
-                                        <label data-program-image-label class="custom-file-label">Upload image (up to 1MB)</label>
-                                        <div class="invalid-feedback">Invalid file</div>
-                                      </div>
+                                        <label data-program-image-label class="custom-file-label">Upload image (up to
+                                            1MB)</label>
+                                        <div class="invalid-feedback">Invalid file. You must upload only one .png file,
+                                            up to 1MB</div>
+                                    </div>
                                 </div>
                             </div>
                             <button class="btn btn-primary float-right" type="submit">
@@ -176,7 +177,18 @@
             </div>
         </div>
     </div>
-    </div>
+    <section id='toast_container'>
+        <div id='error_toast' class="toast d-none m-2" data-autohide="false" role="alert">
+            <div class="toast-header">
+                <strong class="mr-auto">An error has occured</strong>
+                <button type="button" class="ml-2 mb-1 close" data-dismiss="toast">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div data-body class="toast-body">
+            </div>
+        </div>
+    </section>
     <section id="search_bar" class="vertical-center p-4">
         <div class="container">
             <div class="row justify-content-center align-items-center">
@@ -210,9 +222,10 @@
                                     data-card-creation-date>{date}</span></small></p>
                         <p class="card-text"><small class="text-muted">Program #{<span data-card-id></span>}</small></p>
                         <button class="btn btn-primary m-1 float-right" type="edit">Edit</button>
-                        <button class="btn btn-danger m-1 float-right" type="delete"><div data-loading
-                            class="spinner-border spinner-border-sm text-white d-none" role="status">
-                        </div> Delete</button>
+                        <button class="btn btn-danger m-1 float-right" type="delete">
+                            <div data-loading class="spinner-border spinner-border-sm text-white d-none" role="status">
+                            </div> Delete
+                        </button>
                     </div>
                 </div>
             </div>

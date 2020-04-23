@@ -50,6 +50,11 @@ export default class Api {
         }
     }
 
+    withErrorHandler (handler) {
+        this.errorHandler = handler;
+        return this;
+    }
+
     async searchPrograms (searchTerms) {
         await new Promise(resolve => setTimeout(resolve, 1000));
         return listData;

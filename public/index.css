@@ -10,9 +10,16 @@ textarea {
     resize: none;
 }
 
-section#card_container .spinner-border#search_loading {
+#search_loading {
     width: 5rem;
     height: 5rem;
+}
+
+#toast_container {
+    position:absolute;
+    z-index:99999;
+    right:2rem;
+    bottom:2rem;
 }
 
 .vertical-center {

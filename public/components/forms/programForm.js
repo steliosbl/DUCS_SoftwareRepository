@@ -13,7 +13,7 @@ export default class ProgramForm extends Form {
 
         this.innerElements.imageInput.addEventListener('change', e => {
             this.innerElements.imageInputLabel.innerText = this.innerElements.imageInput.value.split('\\').pop();
-            this.innerElements.imageInput.setCustomValidity('Lolll');
+            this.innerElements.imageInput.setCustomValidity(this.validateImage());
         });
     }
 
@@ -48,5 +48,18 @@ export default class ProgramForm extends Form {
             this.innerElements.emailInput.value = d.author.id;
             this.innerElements.descriptionInput.value = d.description;
         }
+    }
+
+    validateImage () {
+        const files = this.innerElements.imageInput.files;
+        if (files.length === 1) {
+            if (files[0].size < 1024 ** 2) {
+                if (files[0].type === 'image/png') {
+                    return '';
+                }
+            }
+        }
+
+        return 'Invalid';
     }
 };

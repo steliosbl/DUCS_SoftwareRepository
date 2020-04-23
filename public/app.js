@@ -1,14 +1,7 @@
 import Api from './api.js';
-import {
-    SearchBar,
-    UserButton,
-    ProgramList
-} from './components/index.js';
-import {
-    ProfileModal,
-    LoginModal,
-    ProgramModal
-} from './components/modals/index.js';
+import { SearchBar, UserButton, ProgramList } from './components/index.js';
+import { ProfileModal, LoginModal, ProgramModal } from './components/modals/index.js';
+import ToastContainer from './components/toastContainer.js';
 
 export default class App {
     constructor () {
@@ -18,7 +11,9 @@ export default class App {
             registrationDate: null,
             loginDate: null
         };
-        this.ListData = [];
+        this.errorToasts = [];
+        this.Api = new Api()
+            .withErrorHandler(this.handleApiError.bind(this));
         this.components = {
             searchBar: SearchBar
                 .fromDefaultElement()
@@ -47,12 +42,14 @@ export default class App {
             programModal: ProgramModal
                 .fromDefaultElement()
                 .withEditHandler(this.editProgram.bind(this))
-                .withNewHandler(this.createProgram.bind(this))
+                .withNewHandler(this.createProgram.bind(this)),
+
+            toastContainer: ToastContainer
+                .fromDefaultElement()
         };
     }
 
     initialize () {
-        this.Api = new Api();
         this.stateFromUrl();
         this.CurrentUser = {
             id: 'real@test.com',
@@ -188,7 +185,7 @@ export default class App {
         this.components.programModal.show(data);
     }
 
-    handleRuntimeError (msg) {
-
+    handleApiError (msg) {
+        this.components.toastContainer.add(msg);
     }
 }
