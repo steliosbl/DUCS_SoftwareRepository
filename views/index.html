@@ -26,7 +26,7 @@
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Login</h5>
+                    <h5 class="modal-title">Please Log In</h5>
                     <button type="button" class="close" data-dismiss="modal">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -35,8 +35,7 @@
                     <form id="login_form" novalidate>
                         <div class="form-row">
                             <div class="col-12 mb-3">
-                                <label for="login_input_email">What is your email?</label>
-                                <input id="login_input_email" type="email" class="form-control" data-input='email'
+                                <input type="email" class="form-control" data-input='email'
                                     placeholder="Enter email..." required>
                                 <div class="invalid-feedback">
                                     Are you 100% sure that is an email?
@@ -45,8 +44,8 @@
                         </div>
                         <div class="form-row d-none" data-name-container>
                             <div class="col-12 mb-3">
-                                <label for="login_input_name">Haven't seen you around before. What is your name?</label>
-                                <input id="login_input_name" type="text" class="form-control" data-input='name'
+                                <label>Haven't seen you around before. What is your name?</label>
+                                <input type="text" class="form-control" data-input='name'
                                     placeholder="Enter name...">
                                 <div class="invalid-feedback">
                                     Doesn't look like any name I've seen before. Try harder
@@ -116,8 +115,62 @@
                                         data-registration-date>{date}</span></small></p>
                         </div>
                         <div class="col-4">
-                            <button class="btn btn-danger float-right" type="logout">Logout</button>
+                            <button class="btn btn-danger float-right" type="logout">Log out</button>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="program_modal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Program Overview</h5>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row justify-content-center">
+                        <form class="ml-4 mr-4" id="program_form" novalidate>
+                            <div class="form-row mb-4">
+                                <div class="col-7">
+                                    <input type="text" class="form-control form-control-lg" data-input='name'
+                                        placeholder="Enter name..." required>
+                                    <div class="invalid-feedback">
+                                        You really want your program to be called that?
+                                    </div>
+                                </div>
+                                <div class="col-5">
+                                    <input type="email" class="form-control form-control-lg" data-input='email' required
+                                        placeholder="Enter email...">
+                                    <div class="invalid-feedback">
+                                        Are you 100% sure that is an email?
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-row mb-4">
+                                <div class="col-12">
+                                    <textarea data-input="description" placeholder="Enter description..." class="form-control form-control-lg"
+                                        rows="3"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-row mb-4">
+                                <div class="col-12">
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" data-input="image">
+                                        <label data-program-image-label class="custom-file-label">Upload image (up to 1MB)</label>
+                                        <div class="invalid-feedback">Invalid file</div>
+                                      </div>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary float-right" type="submit">
+                                <div data-loading class="spinner-border spinner-border-sm text-white mr-1 d-none"
+                                    role="status">
+                                </div>Submit
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -156,6 +209,10 @@
                         <p class="card-text"><small class="text-muted">Created <span
                                     data-card-creation-date>{date}</span></small></p>
                         <p class="card-text"><small class="text-muted">Program #{<span data-card-id></span>}</small></p>
+                        <button class="btn btn-primary m-1 float-right" type="edit">Edit</button>
+                        <button class="btn btn-danger m-1 float-right" type="delete"><div data-loading
+                            class="spinner-border spinner-border-sm text-white d-none" role="status">
+                        </div> Delete</button>
                     </div>
                 </div>
             </div>
@@ -163,7 +220,7 @@
     </section>
     <section id="card_container" class="container">
         <div class="row">
-            <div data-loading class="spinner-border mx-auto text-primary d-none" role="status">
+            <div id="search_loading" data-loading class="spinner-border mx-auto text-primary d-none" role="status">
             </div>
         </div>
 

@@ -32,6 +32,26 @@ export class ProfileModal extends Modal {
         this.innerElements.loginDate.innerText = d;
     }
 
+    withUserData (userObject) {
+        this.User = userObject;
+        return this;
+    }
+
+    get User () {
+        return this.user;
+    }
+
+    set User (u) {
+        this.user = u;
+        this.onUserChanged();
+    }
+
+    onUserChanged () {
+        this.Form.Data = this.User;
+        this.RegistrationDate = this.User.registrationDate;
+        this.LoginDate = this.User.loginDate;
+    }
+
     withProfileEditHandler (handler) {
         this.profileEditHandler = handler;
         return this;
@@ -46,16 +66,10 @@ export class ProfileModal extends Modal {
         return this;
     }
 
-    withUserData (userObject) {
-        this.Form.withUserData(userObject);
-        this.RegistrationDate = userObject.registrationDate;
-        this.LoginDate = userObject.loginDate;
-    }
-
     handleFormSubmission () {
         this.Loading.show();
         if (this.profileEditHandler) {
-            this.profileEditHandler(this.Form.Name)
+            this.profileEditHandler(this.Form.Data)
                 .then(() => {
                     this.hide();
                     this.Form.DisplayValidation = false;
@@ -78,5 +92,10 @@ export class ProfileModal extends Modal {
         this.RegistrationDate = '{date}';
         this.LoginDate = '{date}';
         return this;
+    }
+
+    show (args) {
+        this.Form.NameEditable = Boolean(args && args.editable);
+        super.show();
     }
 };

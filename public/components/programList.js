@@ -8,15 +8,49 @@ export class ProgramList {
             .fromParent(this.element);
 
         this.cards = [];
+        this.UserId = null;
     }
 
     static fromDefaultElement () {
         return new ProgramList(document.getElementById('card_container'));
     }
 
-    withDefaultCardPrototype () {
-        this.cardPrototype = document.getElementById('card_proto');
+    get UserId () {
+        return this.userId;
+    }
+
+    set UserId (u) {
+        this.userId = u;
+        this.onUserIdChanged();
+    }
+
+    onUserIdChanged () {
+        this.cards.forEach(card => {
+            card.ControlsVisible = card.Data.authorId === this.UserId;
+        });
+    }
+
+    withEditHandler (handler) {
+        this.editHandler = handler;
         return this;
+    }
+
+    handleEdit (card) {
+        return this.editHandler(card.data);
+    }
+
+    withDeleteHandler (handler) {
+        this.deleteHandler = handler;
+        return this;
+    }
+
+    handleDelete (card) {
+        card.Loading.show();
+        this.deleteHandler(card).then(() => {
+            this.removeCard(card);
+        }).finally(() => {
+            card.Loading.hide();
+        });
     }
 
     async display (dataPromise) {
@@ -33,6 +67,7 @@ export class ProgramList {
 
     clearAllCards () {
         this.cards.forEach(card => this.removeCard(card));
+        this.cards = [];
     }
 
     removeCard (card) {
@@ -40,17 +75,15 @@ export class ProgramList {
     }
 
     addCard (data) {
-        if (this.cardPrototype) {
-            const newCard = ProgramCard
-                .fromPrototype(this.cardPrototype)
-                .withData(data)
-                .build()
-                .appendTo(this.element)
-                .show();
+        const newCard = ProgramCard
+            .fromDefaultPrototype()
+            .withData(data)
+            .withControlsVisible(data.author.id === this.userId)
+            .withEditHandler(this.handleEdit.bind(this))
+            .withDeleteHandler(this.handleDelete.bind(this))
+            .appendTo(this.element)
+            .show();
 
-            this.cards.push(newCard);
-        } else {
-            throw new Error('Cannot add new card. No card prototype exists. Have you called withCardPrototype?');
-        }
+        this.cards.push(newCard);
     }
 };

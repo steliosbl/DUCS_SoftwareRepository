@@ -17,12 +17,6 @@ export default class ProfileForm extends Form {
         return new ProfileForm(document.getElementById('profile_form'));
     }
 
-    withUserData (userObject) {
-        this.Email = userObject.id;
-        this.Name = userObject.name;
-        return this;
-    }
-
     get Email () {
         return this.innerElements.emailInput.value;
     }
@@ -37,6 +31,35 @@ export default class ProfileForm extends Form {
 
     set Name (n) {
         this.innerElements.nameInput.value = n;
+    }
+
+    get Data () {
+        return {
+            id: this.Email,
+            name: this.Name
+        };
+    }
+
+    set Data (u) {
+        this.Email = u.id;
+        this.Name = u.name;
+    }
+
+    withEditableName (n) {
+        this.NameEditable = n;
+        return this;
+    }
+
+    set NameEditable (n) {
+        if (n) {
+            this.innerElements.nameInput.removeAttribute('disabled');
+        } else {
+            this.innerElements.nameInput.setAttribute('disabled', '');
+        }
+    }
+
+    withVisibleSubmitButton (v) {
+        this.SubmitButtonVisible = v;
     }
 
     get SubmitButtonVisible () {

@@ -28,6 +28,16 @@ export default class Form {
         }
     }
 
+    withCustomValidation (validator) {
+        this.element.addEventListener('submit', e => {
+            e.preventDefault();
+            e.stopPropagation();
+            validator();
+        });
+
+        return this;
+    }
+
     withSubmitHandler (handler) {
         this.element.addEventListener('submit', e => {
             e.preventDefault();

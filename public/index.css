@@ -1,25 +1,30 @@
 body {
-    background-color:#1e1e37;
+    background-color: #1e1e37;
 }
 
 nav {
     background-color: #001427;
 }
 
-section#card_container .spinner-border{
-    width:5rem;
-    height:5rem;
+textarea {
+    resize: none;
+}
+
+section#card_container .spinner-border#search_loading {
+    width: 5rem;
+    height: 5rem;
 }
 
 .vertical-center {
     min-height: 100%;
     min-height: 100vh;
-    min-height: calc(100vh - 56px); /* Should take up entire viewport minus navbar height) */
-  
+    min-height: calc(100vh - 56px);
+    /* Should take up entire viewport minus navbar height) */
+
     display: flex;
     align-items: center;
-  }
+}
 
-main .card img{
-    max-height:250px;
+main .card img {
+    max-height: 250px;
 }

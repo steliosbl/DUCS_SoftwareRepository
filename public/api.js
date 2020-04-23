@@ -1,10 +1,28 @@
+/**
+ * Valid Author/User format
+ * @typedef {Object} Author
+ * @property {string} id The unique Id of the Author (should be their email)
+ * @property {string} name The Author's name
+ * @property {date} registrationDate The date the Author was registered
+ * @property {date} loginDate The date of the Author's last login
+ */
+/**
+ * Valid Program format
+ * @typedef {Object} Program
+ * @property {string} id The unique Id of the program
+ * @property {string} name The name of the program
+ * @property {string} description The description of the program
+ * @property {Author} author The object representing the author if the program
+ * @property {Date} creationDate The date the program was created on
+ * @property {Date} modificationDate The date of the last time the program was modified
+ */
 
 const listData = [{
     id: '4VIduloKlR9_7lPETevPV',
     name: 'program_1',
     description: 'test program',
     author: {
-        id: 'test@example.com',
+        id: 'real@test.com',
         name: 'Test Testerson'
     },
     creationDate: new Date(Date.now()),
@@ -15,7 +33,7 @@ const listData = [{
     name: 'program_2',
     description: 'test program',
     author: {
-        id: 'test@example.com',
+        id: 'real@test.com',
         name: 'Test Testerson'
     },
     creationDate: new Date(Date.now()),
@@ -47,17 +65,41 @@ export default class Api {
         } : false;
     }
 
-    async editAuthor (id, name) {
+    async editAuthor (sessionId, data) {
         await new Promise(resolve => setTimeout(resolve, 1000));
         return {
-            id: id,
-            name: name,
+            id: sessionId,
+            name: data.name,
             registrationDate: 'another date',
             loginDate: 'today'
         };
     }
 
     async register (id, name) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return true;
+    }
+
+    async editProgram (sessionId, program) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return true;
+    }
+
+    async createProgram (sessionId, program) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return {
+            id: 'va9reMQt4nb5JuKOzofjx',
+            name: program.name,
+            description: program.description,
+            authorId: sessionId,
+            author: {
+                id: sessionId,
+                name: 'Test Testerson'
+            }
+        };
+    }
+
+    async deleteProgram (sessionId, program) {
         await new Promise(resolve => setTimeout(resolve, 1000));
         return true;
     }

@@ -22,7 +22,7 @@ export class SearchBar {
                 e.preventDefault();
                 if (this.Value) {
                     this.Active = true;
-                    handler(e);
+                    handler(this.Value);
                 }
             }
         });
@@ -31,7 +31,7 @@ export class SearchBar {
             e.preventDefault();
             if (this.Value) {
                 this.Active = true;
-                handler(e);
+                handler(this.Value);
             }
         };
 
@@ -41,7 +41,7 @@ export class SearchBar {
     withNewHandler (handler) {
         this.innerElements.newButton.onclick = e => {
             e.preventDefault();
-            this.newHandler(e);
+            handler(e);
         };
 
         return this;

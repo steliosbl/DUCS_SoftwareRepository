@@ -1,6 +1,14 @@
 import Api from './api.js';
-import { SearchBar, UserButton, ProgramList } from './components/index.js';
-import { ProfileModal, LoginModal } from './components/modals/index.js';
+import {
+    SearchBar,
+    UserButton,
+    ProgramList
+} from './components/index.js';
+import {
+    ProfileModal,
+    LoginModal,
+    ProgramModal
+} from './components/modals/index.js';
 
 export default class App {
     constructor () {
@@ -9,17 +17,18 @@ export default class App {
             name: null,
             registrationDate: null,
             loginDate: null
-        }
+        };
         this.ListData = [];
-        this.Api = new Api();
         this.components = {
             searchBar: SearchBar
                 .fromDefaultElement()
-                .withSearchHandler(this.search.bind(this)),
+                .withSearchHandler(this.handleSearchTrigger.bind(this))
+                .withNewHandler(this.handleNewButtonClick.bind(this)),
 
             cardList: ProgramList
                 .fromDefaultElement()
-                .withDefaultCardPrototype(),
+                .withEditHandler(this.handleEditButtonClick.bind(this))
+                .withDeleteHandler(this.deleteProgram.bind(this)),
 
             userButton: UserButton
                 .fromDefaultElement()
@@ -33,8 +42,17 @@ export default class App {
             profileModal: ProfileModal
                 .fromDefaultElement()
                 .withProfileEditHandler(this.editUser.bind(this))
-                .withLogoutHandler(this.logout.bind(this))
+                .withLogoutHandler(this.logout.bind(this)),
+
+            programModal: ProgramModal
+                .fromDefaultElement()
+                .withEditHandler(this.editProgram.bind(this))
+                .withNewHandler(this.createProgram.bind(this))
         };
+    }
+
+    initialize () {
+        this.Api = new Api();
         this.stateFromUrl();
         this.CurrentUser = {
             id: 'real@test.com',
@@ -50,23 +68,36 @@ export default class App {
         if (window.location.pathname === '/search') {
             const searchValue = urlParams.get('q');
             if (searchValue) {
-                this.components.searchBar.Active = true;
-                this.components.searchBar.Value = searchValue;
-                this.search();
+                this.SearchTerm = searchValue;
             }
         }
     }
 
+    get SearchTerm () {
+        if (window.location.pathname === '/search') {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('q');
+        } else {
+            return this.components.searchBar.Value;
+        }
+    }
+
+    set SearchTerm (s) {
+        window.history.pushState({
+            hasSearched: true
+        }, 'Search Results', '/search?q=' + s);
+        this.components.searchBar.Value = s;
+        this.components.searchBar.Active = true;
+        this.onSearchTermChanged();
+    }
+
+    onSearchTermChanged () {
+        const dataPromise = this.Api.searchPrograms(this.SearchTerm);
+        this.components.cardList.display(dataPromise);
+    }
+
     get IsLoggedIn () {
         return Boolean(this.CurrentUser.id);
-    }
-
-    get HasSearched () {
-        return this.hasSearched;
-    }
-
-    set HasSearched (h) {
-        this.hasSearched = h;
     }
 
     get CurrentUser () {
@@ -78,35 +109,10 @@ export default class App {
         this.onCurrentUserChanged();
     }
 
-    get ListData () {
-        return this.listData;
-    }
-
-    set ListData (l) {
-        this.listData = l;
-    }
-
-    initialize () {
-
-    }
-
     onCurrentUserChanged () {
         this.components.userButton.Name = this.CurrentUser.name;
-        this.components.profileModal
-            .withUserData(this.CurrentUser);
-    }
-
-    search () {
-        const value = this.components.searchBar.Value;
-
-        this.HasSearched = true;
-        window.history.pushState({
-            hasSearched: true
-        }, 'Search Results', '/search?q=' + value);
-
-        const dataPromise = this.Api.searchPrograms(value);
-
-        this.components.cardList.display(dataPromise);
+        this.components.profileModal.User = this.CurrentUser;
+        this.components.cardList.UserId = this.CurrentUser.id;
     }
 
     login (id) {
@@ -126,7 +132,7 @@ export default class App {
             name: null,
             registrationDate: null,
             loginDate: null
-        }
+        };
     }
 
     register (id, name) {
@@ -135,19 +141,51 @@ export default class App {
         });
     }
 
-    editUser (name) {
-        return this.Api.editAuthor(this.CurrentUser.id, name)
+    editUser (data) {
+        return this.Api.editAuthor(this.CurrentUser.id, data)
             .then(async res => {
-               this.CurrentUser = res;
+                this.CurrentUser = res;
             });
+    }
+
+    editProgram (data) {
+        return this.Api.editProgram(this.CurrentUser.id, data);
+    }
+
+    createProgram (data) {
+        return this.Api.createProgram(this.CurrentUser.id, data).then(res => {
+            this.SearchTerm = res.id;
+        });
+    }
+
+    deleteProgram (card) {
+        return this.Api.deleteProgram(this.CurrentUser.id, card.data.id);
+    }
+
+    handleSearchTrigger (term) {
+        this.SearchTerm = term;
     }
 
     handleUserButtonClick () {
         if (this.IsLoggedIn) {
-            this.components.profileModal.show();
+            this.components.profileModal.show({
+                editable: true
+            });
         } else {
             this.components.loginModal.show();
         }
+    }
+
+    handleNewButtonClick () {
+        if (this.IsLoggedIn) {
+            this.components.programModal.show(this.CurrentUser.id);
+        } else {
+            this.components.loginModal.show();
+        }
+    }
+
+    handleEditButtonClick (data) {
+        this.components.programModal.show(data);
     }
 
     handleRuntimeError (msg) {
