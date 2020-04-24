@@ -4,7 +4,6 @@
  * @property {string} id The unique Id of the Author (should be their email)
  * @property {string} name The Author's name
  * @property {date} registrationDate The date the Author was registered
- * @property {date} loginDate The date of the Author's last login
  */
 /**
  * Valid Program format

@@ -12,7 +12,6 @@ export class ProfileModal extends Modal {
             .withSubmitHandler(this.handleFormSubmission.bind(this));
         this.innerElements = {
             registrationDate: this.element.querySelector('[data-registration-date]'),
-            loginDate: this.element.querySelector('[data-login-date]'),
             logoutButton: this.element.querySelector('button[type="logout"]')
         };
         this.withLogoutHandler(e => {
@@ -21,15 +20,11 @@ export class ProfileModal extends Modal {
     }
 
     static fromDefaultElement () {
-        return new ProfileModal(document.getElementById('user_modal'));
+        return new ProfileModal(document.getElementById('profile_modal'));
     }
 
     set RegistrationDate (d) {
         this.innerElements.registrationDate.innerText = d;
-    }
-
-    set LoginDate (d) {
-        this.innerElements.loginDate.innerText = d;
     }
 
     withUserData (userObject) {
@@ -49,7 +44,6 @@ export class ProfileModal extends Modal {
     onUserChanged () {
         this.Form.Data = this.User;
         this.RegistrationDate = this.User.registrationDate;
-        this.LoginDate = this.User.loginDate;
     }
 
     withProfileEditHandler (handler) {
@@ -90,7 +84,6 @@ export class ProfileModal extends Modal {
         this.hide();
         this.Form.reset();
         this.RegistrationDate = '{date}';
-        this.LoginDate = '{date}';
         return this;
     }
 
