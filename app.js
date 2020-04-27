@@ -3,6 +3,7 @@ const express = require('express');
 const path = require('path');
 const HttpStatus = require('http-status-codes');
 const morgan = require('morgan');
+const cors = require('cors');
 
 // Import middleware
 const jsonErrorHandler = require('./middleware/jsonErrorHandler');
@@ -22,6 +23,9 @@ app.use(jsonErrorHandler);
 if (process.env.NODE_ENV !== 'test') {
   app.use(morgan('dev'));
 }
+
+// Initialize CORS
+app.use(cors());
 
 // Set JSON encoding
 app.use(express.json());
