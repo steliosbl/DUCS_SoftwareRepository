@@ -16,11 +16,12 @@ module.exports = {
             .expect('Content-Type', /json/);
     },
 
-    createProgram: (sessionId, description) => {
+    createProgram: (sessionId, description, title) => {
         return request.post('/program')
             .send({
                 description: description || defaults.description,
-                sessionId: sessionId || defaults.authorId
+                sessionId: sessionId || defaults.authorId,
+                title: title || defaults.title
             })
             .expect('Content-Type', /json/);
     },

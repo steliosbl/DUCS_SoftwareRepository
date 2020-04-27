@@ -16,12 +16,42 @@ const programRouter = express.Router();
 // GET at root path (of this router)
 // Request (query) is validated before being processed
 programRouter.get('/', validate.GET, reportValidationErrors, getProgramFrom('query'), (req, res) => {
-    var value = {};
+    var value;
 
     // The middleware attempts to get the program from the query by Id
     // If there is an Id in the query and the program is found, respond with its data
     if (res.program) {
         value = [res.program.value()];
+    } else if (req.query.q) {
+        // If the q query param exists then this is a search
+        value = [];
+
+        // First search for an exact Id match
+        const idSearch = req.app.db
+            .get('programs')
+            .find({
+                id: req.query.q
+            });
+
+        // Then search for an exact author match
+        const authorSearch = req.app.db
+            .get('programs')
+            .find({
+                authorId: req.query.q
+            });
+
+        // Finally, search for a partial title match
+        const titleSearch = req.app.db
+            .get('programs')
+            .filter(prog => {
+                return prog.title.includes(req.query.q);
+            });
+
+        // Make sure value is always an array even if there is only one match
+        value = [].concat(idSearch.value() ||
+            authorSearch.value() ||
+            titleSearch.value() ||
+            []);
     } else {
         // If there are no query parameters, then respond with all program data
         value = req.app.db
@@ -38,9 +68,43 @@ programRouter.get('/', validate.GET, reportValidationErrors, getProgramFrom('que
             }).value();
     });
 
-    // Respond with 200-Ok and whatever data has been chosen
-    return res.status(HttpStatus.OK)
-        .json(value);
+    // Paginate results if start/stop query params are present
+    var start = req.query.start;
+    var stop = req.query.stop;
+
+    // If either is defined
+    if (start || stop) {
+        // If both are defined and start is greater than stop
+        if (start && stop && start > stop) {
+            // Swap them
+            [start, stop] = [stop, start];
+        }
+
+        // Cap both at value.length
+        if (start > value.length) {
+            start = value.length;
+        }
+
+        if (stop > value.length) {
+            stop = value.length;
+        }
+    } else {
+        // Otherwise set default values
+        start = 0;
+        stop = value.length;
+    }
+
+    value = value.slice(start, stop);
+
+    // If there is any data
+    if (value) {
+        // Respond with 200-Ok and whatever data has been chosen
+        return res.status(HttpStatus.OK)
+            .json(value);
+    } else {
+        return res.status(HttpStatus.NOT_FOUND)
+            .json([]);
+    }
 });
 
 // POST at root path

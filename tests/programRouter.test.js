@@ -38,28 +38,56 @@ describe('Test programRouter', () => {
     });
 
     it('Responds to POST with error 422-Unprocessable Entity if a field in the request body is missing, empty or contains invalid data', async () => {
-        const program = {
-            sessionId: defaults.authorId,
-            description: defaults.description
-        };
+        const sessionId = defaults.authorId;
+        const description = defaults.description;
+        const title = defaults.title;
 
-        await createAuthor(program.sessionId)
+        await createAuthor(sessionId)
             .expect(201);
 
+        // Missing title
         await request.post('/program')
             .send({
-                sessionId: program.sessionId
+                sessionId: sessionId,
+                description: description
             }).expect(422);
 
+        // Missing sessionId
+        await request.post('/program')
+            .send({
+                description: description,
+                title: title
+            }).expect(422);
+
+        // Missing description
+        await request.post('/program')
+            .send({
+                sessionId: sessionId,
+                title: title
+            }).expect(422);
+            
+        // Empty title
+        await request.post('/program')
+            .send({
+                sessionId: sessionId,
+                description: description,
+                title: ''
+            }).expect(422);
+
+        // Empty sessionId
         await request.post('/program')
             .send({
                 sessionId: '',
-                description: program.description
+                description: description,
+                title: title
             }).expect(422);
 
+        // Invalid sessionId
         await request.post('/program')
             .send({
-                description: program.description
+                sessionId: 'invalid',
+                description: description,
+                title: title
             }).expect(422);
     });
 
@@ -88,12 +116,87 @@ describe('Test programRouter', () => {
         await request.get('/program?id=' + id)
             .expect(200)
             .then(res => {
-                expect(res.body).toHaveProperty('id');
-                expect(res.body).toHaveProperty('creationDate');
-                expect(res.body).toHaveProperty('modificationDate');
-                expect(res.body.authorId).toBe(defaults.authorId);
-                expect(res.body.description).toBe(defaults.description)
-                expect(res.body.creationDate).toBe(res.body.modificationDate);
+                expect(res.body.length).toBe(1);
+                expect(Array.isArray(res.body)).toBe(true);
+                expect(res.body[0]).toHaveProperty('id');
+                expect(res.body[0]).toHaveProperty('creationDate');
+                expect(res.body[0]).toHaveProperty('modificationDate');
+                expect(res.body[0].authorId).toBe(defaults.authorId);
+                expect(res.body[0].title).toBe(defaults.title);
+                expect(res.body[0].description).toBe(defaults.description)
+                expect(res.body[0].creationDate).toBe(res.body[0].modificationDate);
+            })
+    });
+
+    it('Responds to GET with a JSON array when performing a search', async () => {
+        await request.get('/program?q=test')
+            .expect(200)
+            .then(res => {
+                expect(res.body.length).toBe(0);
+                expect(Array.isArray(res.body)).toBe(true);
+            });
+    });
+
+    it('Responds to GET with the correct data when searching with an exact Id', async () => {
+        await createAuthor()
+            .expect(201);
+
+        const id = (await createProgram()
+            .expect(201)).body.id;
+
+        await createProgram()
+            .expect(201);
+
+        await request.get('/program?q=' + id)
+            .expect(200)
+            .then(res => {
+                expect(res.body.length).toBe(1);
+                expect(res.body[0].id).toBe(id);
+                expect(res.body[0].title).toBe(defaults.title);
+            })
+    });
+
+    it('Responds to GET with the correct data when searching with an exact author Id', async () => {
+        await createAuthor()
+            .expect(201);
+
+        await createAuthor('different@author.com')
+            .expect(201);
+
+        await createProgram()
+            .expect(201);
+
+        await createProgram('different@author.com')
+            .expect(201);
+
+        await request.get('/program?q=' + defaults.authorId)
+            .expect(200)
+            .then(res => {
+                expect(res.body.length).toBe(1);
+                expect(res.body[0].authorId).toBe(defaults.authorId);
+                expect(res.body[0].title).toBe(defaults.title);
+            });
+    });
+
+    it('Responds to GET with the correct data when searching by title', async () => {
+        await createAuthor()
+            .expect(201);
+
+        await createProgram(defaults.authorId, defaults.description, 'should_find')
+            .expect(201);
+
+        await createProgram(defaults.authorId, defaults.description, 'should_also_find')
+            .expect(201);
+
+        await createProgram(defaults.authorId, defaults.description, 'dont_find')
+            .expect(201);
+
+        await request.get('/program?q=should')
+            .expect(200)
+            .then(res => {
+                expect(res.body.length).toBe(2)
+                expect(res.body[0].authorId).toBe(defaults.authorId);
+                expect(res.body[1].authorId).toBe(defaults.authorId);
             })
     });
 
