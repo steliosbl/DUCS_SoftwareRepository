@@ -31,7 +31,6 @@ export default class Form {
     withCustomValidation (validator) {
         this.element.addEventListener('submit', e => {
             e.preventDefault();
-            e.stopPropagation();
             validator();
         });
 
@@ -41,7 +40,6 @@ export default class Form {
     withSubmitHandler (handler) {
         this.element.addEventListener('submit', e => {
             e.preventDefault();
-            e.stopPropagation();
             if (this.element.checkValidity()) {
                handler(e);
             }

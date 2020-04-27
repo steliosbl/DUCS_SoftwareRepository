@@ -53,7 +53,7 @@ export class LoginModal extends Modal {
 
     register () {
         if (this.registrationHandler) {
-            return this.registrationHandler(this.Form.email, this.Form.name)
+            return this.registrationHandler(this.Form.Email, this.Form.Name)
                 .then(() => {
                     this.reset();
                 });

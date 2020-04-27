@@ -1,6 +1,7 @@
 import LoadingSpinner from '../loadingSpinner.js';
 import ProfileForm from '../forms/profileForm.js';
 import Modal from './modal.js';
+import DateFormat from '../../dateFormat.js';
 
 export class ProfileModal extends Modal {
     constructor (element) {
@@ -24,7 +25,7 @@ export class ProfileModal extends Modal {
     }
 
     set RegistrationDate (d) {
-        this.innerElements.registrationDate.innerText = d;
+        this.innerElements.registrationDate.innerText = DateFormat.format(new Date(d));
     }
 
     withUserData (userObject) {

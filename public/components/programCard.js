@@ -1,4 +1,5 @@
 import LoadingSpinner from './loadingSpinner.js';
+import DateFormat from '../dateFormat.js';
 
 export default class ProgramCard {
     constructor (element) {
@@ -40,11 +41,11 @@ export default class ProgramCard {
     }
 
     onDataChanged () {
-        this.innerElements.title.innerText = this.Data.name;
+        this.innerElements.title.innerText = this.Data.title;
         this.innerElements.description.innerText = this.Data.description;
         this.innerElements.author.innerText = this.Data.author.name;
-        this.innerElements.modificationDate.innerText = this.Data.modificationDate;
-        this.innerElements.creationDate.innerText = this.Data.creationDate;
+        this.innerElements.modificationDate.innerText = DateFormat.format(new Date(this.Data.modificationDate));
+        this.innerElements.creationDate.innerText = DateFormat.format(new Date(this.Data.creationDate));
         this.innerElements.id.innerText = this.Data.id;
         this.innerElements.image.src = '/image/' + this.Data.id;
     }
