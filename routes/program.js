@@ -21,13 +21,22 @@ programRouter.get('/', validate.GET, reportValidationErrors, getProgramFrom('que
     // The middleware attempts to get the program from the query by Id
     // If there is an Id in the query and the program is found, respond with its data
     if (res.program) {
-        value = res.program.value();
+        value = [res.program.value()];
     } else {
         // If there are no query parameters, then respond with all program data
         value = req.app.db
             .get('programs')
             .value();
     }
+
+    // Add authors to programs
+    value.forEach(program => {
+        program.author = req.app.db
+            .get('authors')
+            .find({
+                id: program.authorId
+            }).value();
+    });
 
     // Respond with 200-Ok and whatever data has been chosen
     return res.status(HttpStatus.OK)
