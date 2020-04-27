@@ -20,6 +20,18 @@ const schema = {
             errorMessage: 'Invalid length'
         }
     },
+    title: {
+        in: ['body', 'query'], // Title is expected to be either in the query string or the request body
+        escape: true,
+        trim: true,
+        isLength: {
+            options: { // It must be between 1 and 69 characters in length
+                min: 1,
+                max: 69
+            },
+            errorMessage: 'Invalid length'
+        }
+    },
     authorId: {
         in: ['body', 'query'], // AuthorId is expected to be either in the query string or the request body
         ...author.id
@@ -44,6 +56,10 @@ module.exports = {
         authorId: {
             optional: true,
             ...schema.authorId
+        },
+        title: {
+            optional: true,
+            ...schema.title
         }
     }),
 
@@ -52,6 +68,10 @@ module.exports = {
         sessionId: {
             exists: true,
             ...schema.authorId
+        },
+        title: {
+            exists: true,
+            ...schema.title
         },
         description: {
             exists: true,
@@ -68,6 +88,10 @@ module.exports = {
         sessionId: {
             exists: true,
             ...schema.authorId
+        },
+        title: {
+            optional: true,
+            ...schema.title
         },
         authorId: {
             optional: true,

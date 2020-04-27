@@ -58,6 +58,7 @@ programRouter.post('/', validate.POST, reportValidationErrors, (req, res) => {
         const date = new Date(Date.now()).toISOString();
         const newProgram = {
             id: idGenerator(),
+            title: req.body.title,
             creationDate: date,
             modificationDate: date,
             authorId: req.body.sessionId,
@@ -87,6 +88,8 @@ programRouter.post('/', validate.POST, reportValidationErrors, (req, res) => {
 programRouter.put('/', validate.PUT, reportValidationErrors, getProgramFrom('query'), checkSessionId, (req, res) => {
     // Assign the new data from the body to the object in the database, and update the modificatio ndate
     res.program.assign({
+        title: req.body.title || res.program.title,
+        authorId: req.body.authorId || res.program.authorId,
         description: req.body.description || res.program.description,
         modificationDate: new Date(Date.now()).toISOString()
     }).write();
