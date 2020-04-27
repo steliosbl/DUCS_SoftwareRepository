@@ -47,6 +47,18 @@ export class ProfileModal extends Modal {
         this.RegistrationDate = this.User.registrationDate;
     }
 
+    get LogoutButtonVisible () {
+        return this.innerElements.logoutButton.classList.contains('d-none');
+    }
+
+    set LogoutButtonVisible (v) {
+        if (v) {
+            this.innerElements.logoutButton.classList.remove('d-none');
+        } else {
+            this.innerElements.logoutButton.classList.add('d-none');
+        }
+    }
+
     withProfileEditHandler (handler) {
         this.profileEditHandler = handler;
         return this;
@@ -90,6 +102,7 @@ export class ProfileModal extends Modal {
 
     show (args) {
         this.Form.NameEditable = Boolean(args && args.editable);
+        this.LogoutButtonVisible = Boolean(args && args.editable);
         super.show();
     }
 };

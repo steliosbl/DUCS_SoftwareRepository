@@ -69,12 +69,12 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="row no-gutters">
+                    <div class="row d-flex flex-wrap align-items-center">
                         <div class="col-md-4">
-                            <img class="img-fluid mx-auto d-block bd-placeholder-img data-image"
+                            <img class="img-fluid mx-auto h-50 p-4 d-block bd-placeholder-img data-image"
                                 src="assets/profile.svg">
                         </div>
-                        <div class="col-md-7 ml-4">
+                        <div class="col-md-7">
                             <form id="profile_form" novalidate>
                                 <div class="form-row">
                                     <div class="col-12 mb-3">
@@ -108,7 +108,7 @@
                                         data-registration-date>{date}</span></small></p>
                         </div>
                         <div class="col-4">
-                            <button class="btn btn-danger float-right" type="logout">Log out</button>
+                            <button class="d-none btn btn-danger float-right" type="logout">Log out</button>
                         </div>
                     </div>
                 </div>
@@ -200,16 +200,16 @@
     </section>
     <section id="card_prototype_container" class="d-none">
         <div id="card_proto" class="card mb-3 p-2 d-none">
-            <div class="row no-gutters">
+            <div class="row d-flex flex-wrap align-items-center no-gutters">
                 <div class="col-md-4">
-                    <img class="img-fluid mx-auto d-block bd-placeholder-img" data-card-img
+                    <img class="img-fluid mx-auto w-50 h-50 d-block bd-placeholder-img" data-card-img
                         src="assets/placeholder.svg">
                 </div>
                 <div class="col-md-8">
                     <div class="card-body">
                         <h5 data-card-title class="card-title">{title}</h5>
                         <p data-card-description class="card-text">{descritpion}</p>
-                        <p class="card-text text-right">By <span data-card-author>{name}</span></p>
+                        <button type="profile" class="btn btn-light float-right">By <span data-card-author>{name}</span></span></button>
                         <p class="card-text"><small class="text-muted">Last updated <span
                                     data-card-modification-date>{date}</span></small></p>
                         <p class="card-text"><small class="text-muted">Created <span

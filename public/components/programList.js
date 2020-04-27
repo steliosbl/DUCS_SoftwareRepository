@@ -53,6 +53,15 @@ export class ProgramList {
         });
     }
 
+    withProfileHandler (handler) {
+        this.profileHandler = handler;
+        return this;
+    }
+
+    handleProfile (card) {
+        this.profileHandler(card.Data.author);
+    }
+
     async display (dataPromise) {
         this.clearAllCards();
         this.Loading.show();
@@ -81,6 +90,7 @@ export class ProgramList {
             .withControlsVisible(data.author.id === this.userId)
             .withEditHandler(this.handleEdit.bind(this))
             .withDeleteHandler(this.handleDelete.bind(this))
+            .withProfileHandler(this.handleProfile.bind(this))
             .appendTo(this.element)
             .show();
 

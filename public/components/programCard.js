@@ -15,7 +15,8 @@ export default class ProgramCard {
             id: this.element.querySelector('[data-card-id]'),
             image: this.element.querySelector('[data-card-img]'),
             editButton: this.element.querySelector('button[type="edit"]'),
-            deleteButton: this.element.querySelector('button[type="delete"]')
+            deleteButton: this.element.querySelector('button[type="delete"]'),
+            profileButton: this.element.querySelector('button[type="profile"]')
         };
     }
 
@@ -72,6 +73,11 @@ export default class ProgramCard {
 
     withDeleteHandler (handler) {
         this.innerElements.deleteButton.addEventListener('click', e => handler(this));
+        return this;
+    }
+
+    withProfileHandler (handler) {
+        this.innerElements.profileButton.addEventListener('click', e => handler(this));
         return this;
     }
 
