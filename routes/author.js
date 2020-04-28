@@ -78,25 +78,21 @@ authorRouter.get('/:id', (req, res) => {
 // PUT at root path with Id parameter
 // Request body is validated before being processed
 authorRouter.put('/:id', validate.PUT, reportValidationErrors, (req, res) => {
-    // Make sure there are no extraneous keys in the request body
-    var validRequest = Object.keys(req.body)
-        .every(key => key in res.author.value());
-
-    // If the request body is valid
-    if (validRequest) {
-        // Pass the new data to the database
-        res.author.assign(req.body)
-            .write();
+    // If the current user has permission to edit this profile
+    if (req.body.sessionId === res.author.value().id) {
+        res.author.assign({
+            name: req.body.name || res.author.name
+        }).write();
 
         // Respond with 200-Ok and the new data
         return res.status(HttpStatus.OK)
             .json(res.author.value());
+    } else {
+        // Otherwise, respond with 403-Forbidden
+        return res.status(HttpStatus.FORBIDDEN).json({
+            errors: ['User does not have permission to edit another profile']
+        });
     }
-
-    // If there are invalid keys, respond with error 422-Unprocessable Entity
-    return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
-        errors: ['Invalid keys in request body']
-    });
 });
 
 // DELETE at root path with Id parameter

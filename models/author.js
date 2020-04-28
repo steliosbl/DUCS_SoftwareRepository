@@ -48,7 +48,7 @@ module.exports = {
 
     // PUTs must have an Id, and optionally can have a name
     PUT: checkSchema({
-        id: {
+        sessionId: {
             exists: true,
             ...schema.id
         },
