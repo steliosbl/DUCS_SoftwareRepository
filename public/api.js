@@ -17,27 +17,27 @@
  */
 
 const listData = [{
-    id: '4VIduloKlR9_7lPETevPV',
-    name: 'program_1',
-    description: 'test program',
-    author: {
-        id: 'real@test.com',
-        name: 'Test Testerson'
+        id: '4VIduloKlR9_7lPETevPV',
+        name: 'program_1',
+        description: 'test program',
+        author: {
+            id: 'real@test.com',
+            name: 'Test Testerson'
+        },
+        creationDate: new Date(Date.now()),
+        modificationDate: new Date(Date.now())
     },
-    creationDate: new Date(Date.now()),
-    modificationDate: new Date(Date.now())
-},
-{
-    id: 'va9reMQt4nb5JuKOzofjx',
-    name: 'program_2',
-    description: 'test program',
-    author: {
-        id: 'real@test.com',
-        name: 'Test Testerson'
-    },
-    creationDate: new Date(Date.now()),
-    modificationDate: new Date(Date.now())
-}
+    {
+        id: 'va9reMQt4nb5JuKOzofjx',
+        name: 'program_2',
+        description: 'test program',
+        author: {
+            id: 'real@test.com',
+            name: 'Test Testerson'
+        },
+        creationDate: new Date(Date.now()),
+        modificationDate: new Date(Date.now())
+    }
 ];
 
 export default class Api {
@@ -49,62 +49,183 @@ export default class Api {
         }
     }
 
+    fetchWithDefaults (path, args = {}) {
+        return fetch(this.Address + path, {
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                ...args
+            })
+            .then(res => {
+                if (res.status === 400) {
+                    this.errorHandler('API responded with 400 - Bad Request. Are you sure you are sending the correct content type?');
+                    console.log(res.json());
+                } else if (res.status === 422) {
+                    this.errorHandler('API was unable to validate the request. Please check the data you have enterred');
+                    console.log(res.json());
+                } else if (res.status === 403) {
+                    this.errorHandler('You do not have permission for this action');
+                    console.log(res.json());
+                }
+
+                return res;
+            })
+            .catch(err => {
+                if (err instanceof TypeError) {
+                    this.errorHandler('Unable to reach API. Check the console for details');
+                }
+                throw err;
+            });
+    }
+
     withErrorHandler (handler) {
         this.errorHandler = handler;
         return this;
     }
 
     async searchPrograms (searchTerms) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        return listData;
+        const params = Object.keys(searchTerms)
+            .map(key => key + '=' + searchTerms[key])
+            .join('&');
+        return this.fetchWithDefaults('/program?' + params)
+            .then(res => {
+                if (res.ok) {
+                    return res.json();
+                } else if (res.status === 404) {
+                    return false;
+                }
+
+                this.errorHandler('API sent invalid response. Check console for details');
+                throw new Error(res.json());
+            });
     }
 
     async getAuthor (id) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        return id === 'real@test.com' ? {
-            id: 'real@test.com',
-            name: 'testy testerson',
-            registrationDate: 'a date',
-            loginDate: 'today'
-        } : false;
+        return this.fetchWithDefaults('/author/' + id)
+            .then(res => {
+                if (res.ok) {
+                    return res.json();
+                } else if (res.status === 404) {
+                    return false;
+                }
+
+                this.errorHandler('API sent invalid response. Check console for details');
+                throw new Error(res.json());
+            });
     }
 
     async editAuthor (sessionId, data) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        return {
-            id: sessionId,
-            name: data.name,
-            registrationDate: 'another date',
-            loginDate: 'today'
-        };
+        return this.fetchWithDefaults('/author/' + data.id, {
+            method: 'PUT',
+            body: JSON.stringify({
+                sessionId: sessionId,
+                name: data.name
+            })
+        }).then(res => {
+            if (res.status === 200) {
+                return res.json();
+            }
+
+            this.errorHandler('Unable to modify profile');
+            throw new Error(res.json());
+        });
     }
 
-    async register (id, name) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        return true;
+    async createAuthor (id, name) {
+        return this.fetchWithDefaults('/author', {
+            method: 'POST',
+            body: JSON.stringify({
+                id: id,
+                name: name
+            })
+        }).then(res => {
+            if (res.status === 201) {
+                return res.json();
+            } else if (res.status === 409) {
+                this.errorHandler('The Id you attempted to register is already in use');
+                throw new Error(res.json());
+            }
+        });
     }
 
     async editProgram (sessionId, program) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        return true;
+        return this.fetchWithDefaults('/program?id=' + program.id, {
+            method: 'PUT',
+            body: JSON.stringify({
+                sessionId: sessionId,
+                title: program.title,
+                description: program.description,
+                authorId: program.authorId
+            })
+        }).then(res => {
+            if (res.status === 200) {
+                return res.json().then(json => {
+                    if (program.image) {
+                        this.uploadImage(json.id, program.image);
+                    }
+                    return json;
+                });
+            } else if (res.status === 424) {
+                this.errorHandler('Failed to create new program: The authorId you submitted does not exist');
+                throw new Error(res.json());
+            } else {
+                this.errorHandler('API sent invalid response. Check console for details');
+                throw new Error(res.json());
+            }
+        });
     }
 
     async createProgram (sessionId, program) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        return {
-            id: 'va9reMQt4nb5JuKOzofjx',
-            name: program.name,
-            description: program.description,
-            authorId: sessionId,
-            author: {
-                id: sessionId,
-                name: 'Test Testerson'
+        return this.fetchWithDefaults('/program', {
+            method: 'POST',
+            body: JSON.stringify({
+                sessionId: sessionId,
+                title: program.title,
+                description: program.description
+            })
+        }).then(res => {
+            if (res.status === 201) {
+                return res.json().then(json => {
+                    if (program.image) {
+                        this.uploadImage(json.id, program.image);
+                    }
+                    return json;
+                });
+            } else if (res.status === 424) {
+                this.errorHandler('Failed to create new program: The authorId you submitted does not exist');
+                throw new Error(res.json());
+            } else {
+                this.errorHandler('API sent invalid response. Check console for details');
+                throw new Error(res.json());
             }
-        };
+        });
     }
 
-    async deleteProgram (sessionId, program) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        return true;
+    async deleteProgram (sessionId, id) {
+        return this.fetchWithDefaults('/program?id=' + id, {
+            method: 'DELETE',
+            body: JSON.stringify({
+                sessionId: sessionId
+            })
+        }).then(res => {
+            if (res.status === 200) {
+                return res.json();
+            }
+        });
+    }
+
+    async uploadImage (id, image) {
+        const fd = new FormData();
+        fd.append('image', image);
+        return fetch(this.Address + '/image/' + id, {
+            method: 'POST',
+            body: fd
+        }).then(imgRes => {
+            if (imgRes.status !== 200) {
+                this.errorHandler('Failed to upload image');
+                console.log(imgRes.json());
+            }
+        });
     }
 };

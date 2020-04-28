@@ -23,7 +23,8 @@ export default class App {
             cardList: ProgramList
                 .fromDefaultElement()
                 .withEditHandler(this.handleEditButtonClick.bind(this))
-                .withDeleteHandler(this.deleteProgram.bind(this)),
+                .withDeleteHandler(this.deleteProgram.bind(this))
+                .withProfileHandler(this.handleProfileButtonClick.bind(this)),
 
             userButton: UserButton
                 .fromDefaultElement()
@@ -51,12 +52,6 @@ export default class App {
 
     initialize () {
         this.stateFromUrl();
-        this.CurrentUser = {
-            id: 'real@test.com',
-            name: 'testy testerson',
-            registrationDate: 'a date',
-            loginDate: 'today'
-        };
     }
 
     stateFromUrl () {
@@ -89,7 +84,9 @@ export default class App {
     }
 
     onSearchTermChanged () {
-        const dataPromise = this.Api.searchPrograms(this.SearchTerm);
+        const dataPromise = this.Api.searchPrograms({
+            q: this.SearchTerm
+        });
         this.components.cardList.display(dataPromise);
     }
 
@@ -108,7 +105,6 @@ export default class App {
 
     onCurrentUserChanged () {
         this.components.userButton.Name = this.CurrentUser.name;
-        this.components.profileModal.User = this.CurrentUser;
         this.components.cardList.UserId = this.CurrentUser.id;
     }
 
@@ -133,9 +129,8 @@ export default class App {
     }
 
     register (id, name) {
-        return this.Api.register(id, name).then(async () => {
-            await this.login(id);
-        });
+        return this.Api.createAuthor(id, name)
+            .then(res => this.login(res.id));
     }
 
     editUser (data) {
@@ -146,7 +141,9 @@ export default class App {
     }
 
     editProgram (data) {
-        return this.Api.editProgram(this.CurrentUser.id, data);
+        return this.Api.editProgram(this.CurrentUser.id, data).then(res => {
+            this.SearchTerm = res.id;
+        });
     }
 
     createProgram (data) {
@@ -165,12 +162,21 @@ export default class App {
 
     handleUserButtonClick () {
         if (this.IsLoggedIn) {
+            this.components.profileModal.User = this.CurrentUser;
             this.components.profileModal.show({
                 editable: true
             });
         } else {
             this.components.loginModal.show();
         }
+    }
+
+    handleProfileButtonClick (userData) {
+        this.components.profileModal
+            .withUserData(userData)
+            .show({
+                editable: userData.id === this.CurrentUser.id
+            });
     }
 
     handleNewButtonClick () {

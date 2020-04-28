@@ -4,7 +4,7 @@ export default class ProgramForm extends Form {
     constructor (element) {
         super(element);
         this.innerElements = {
-            nameInput: this.element.querySelector('[data-input="name"]'),
+            titleInput: this.element.querySelector('[data-input="title"]'),
             emailInput: this.element.querySelector('[data-input="email"]'),
             descriptionInput: this.element.querySelector('[data-input="description"]'),
             imageInput: this.element.querySelector('[data-input="image"]'),
@@ -31,11 +31,11 @@ export default class ProgramForm extends Form {
 
     get Data () {
         return {
-            id: this.id,
-            name: this.innerElements.nameInput.value,
+            id: this.programId,
+            title: this.innerElements.titleInput.value,
             authorId: this.innerElements.emailInput.value,
             description: this.innerElements.descriptionInput.value,
-            image: this.innerElements.imageInput.files
+            image: this.innerElements.imageInput.files[0]
         };
     }
 
@@ -44,7 +44,7 @@ export default class ProgramForm extends Form {
             this.innerElements.emailInput.value = d;
         } else {
             this.programId = d.id;
-            this.innerElements.nameInput.value = d.name;
+            this.innerElements.titleInput.value = d.title;
             this.innerElements.emailInput.value = d.author.id;
             this.innerElements.descriptionInput.value = d.description;
         }
