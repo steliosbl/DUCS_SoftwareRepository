@@ -256,4 +256,45 @@ describe('Test programRouter', () => {
             }).expect(422)
     });
 
+    it('Responds to PUT with error 424-Failed Dependency when given an authorId that does not exist', async () => {
+        await createAuthor()
+            .expect(201);
+
+        const id = (await createProgram()).body.id;
+
+        return request.put('/program?id=' + id)
+            .send({
+                sessionId: defaults.authorId,
+                authorId: 'fake@id.com'
+            }).expect(424)
+    });
+
+    it('Responds to PUT with the correct data if everything is ok', async () => {
+        const data = {
+            sessionId: defaults.authorId,
+            authorId: 'other@id.com',
+            title: 'Other title',
+            description: 'A description'
+        }
+        
+        await createAuthor()
+            .expect(201);
+
+        await createAuthor(data.authorId)
+            .expect(201);
+
+        const program = (await createProgram()).body;
+        const id = program.id;
+        const modificationDate = program.modificationDate
+
+        return request.put('/program?id=' + id)
+            .send(data)
+            .expect(200)
+            .then(res => {
+                expect(res.body.id).toBe(id);
+                expect(res.body.title).toBe(data.title);
+                expect(res.body.authorId).toBe(data.authorId);
+                expect(res.body.modificationDate === modificationDate).toBe(false)
+            })
+    });
 });

@@ -37,11 +37,15 @@ programRouter.get('/', validate.GET, reportValidationErrors, getProgramFrom('que
             });
 
         // Then search for an exact author match
-        const authorSearch = req.app.db
+        var authorSearch = req.app.db
             .get('programs')
             .filter(prog => {
-                return prog.authorId === req.query.q
-            });
+                return prog.authorId === req.query.q;
+            }).value();
+
+        if (authorSearch.length === 0) {
+            authorSearch = undefined;
+        }
 
         // Finally, search for a partial title match
         const titleSearch = req.app.db
@@ -52,9 +56,9 @@ programRouter.get('/', validate.GET, reportValidationErrors, getProgramFrom('que
 
         // Make sure value is always an array even if there is only one match
         value = [].concat(idSearch.value() ||
-            authorSearch.value() ||
-            titleSearch.value() ||
-            []);
+            authorSearch ||
+            titleSearch.value() || []);
+
     } else {
         // If there are no query parameters, then respond with all program data
         value = req.app.db
@@ -94,7 +98,7 @@ programRouter.get('/', validate.GET, reportValidationErrors, getProgramFrom('que
     } else {
         // Otherwise set default values
         start = 0;
-        stop = value.length;
+        stop = value.length + 1;
     }
 
     value = value.slice(start, stop);
@@ -153,6 +157,23 @@ programRouter.post('/', validate.POST, reportValidationErrors, (req, res) => {
 // The middleware attempts to get the program being edited from the query Id
 // The middleware verifies the sessionId given in the request body
 programRouter.put('/', validate.PUT, reportValidationErrors, getProgramFrom('query'), checkSessionId, (req, res) => {
+    // If the authorId is being edited
+    if (req.body.authorId) {
+        // Check that the new author exists
+        const authorExists = Boolean(req.app.db
+            .get('authors')
+            .find({
+                id: req.body.authorId
+            }).value());
+
+        if (!authorExists) {
+            // If not, respond with error 424-Failed Dependency
+            return res.status(HttpStatus.FAILED_DEPENDENCY).json({
+                errors: ['SessionId does not correspond to a registered user']
+            });
+        }
+    }
+
     // Assign the new data from the body to the object in the database, and update the modificatio ndate
     res.program.assign({
         title: req.body.title || res.program.title,
