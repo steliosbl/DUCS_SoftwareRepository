@@ -12,12 +12,8 @@ module.exports = {
             ...program.id
         }
     }),
-    // POSTS must have a sessionId and a program Id
+    // POSTS must have a program Id
     POST: checkSchema({
-        sessionId: {
-            exists: true,
-            ...author.id
-        },
         id: {
             exists: true,
             ...program.id

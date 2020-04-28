@@ -9,7 +9,6 @@ const reportValidationErrors = require('../middleware/reportValidationErrors');
 
 // Import middleware
 const getProgramFrom = require('../middleware/getProgramFrom');
-const checkSessionId = require('../middleware/checkSessionId');
 
 // Initialize router
 const imageRouter = express.Router();
@@ -36,7 +35,7 @@ imageRouter.get('/:id', validate.GET, reportValidationErrors, getProgramFrom('pa
 
 // POST at root path
 // Request body is validated before being processed
-imageRouter.post('/', validate.POST, reportValidationErrors, getProgramFrom('body'), checkSessionId, (req, res) => {
+imageRouter.post('/:id', validate.POST, reportValidationErrors, getProgramFrom('params'), (req, res) => {
     // If a file has been attached under the key 'image'
     if (req.files && Object.keys(req.files).length !== 0 && req.files.image) {
         // If the file is of type .png
@@ -44,7 +43,7 @@ imageRouter.post('/', validate.POST, reportValidationErrors, getProgramFrom('bod
             // If the file has not been truncated due to being over the limit
             if (!req.files.image.truncated) {
                 // Accept the file and move it to the data directory, renaming it to {program Id}.png
-                req.files.image.mv(path.join(__dirname, '../.data/static/images/', req.body.id + '.png'));
+                req.files.image.mv(path.join(__dirname, '../.data/static/images/', res.program.value().id + '.png'));
 
                 // Respond with 200-Ok
                 return res.status(HttpStatus.OK)

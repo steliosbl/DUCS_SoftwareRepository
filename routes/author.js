@@ -8,6 +8,9 @@ const reportValidationErrors = require('../middleware/reportValidationErrors');
 // Initialize router
 const authorRouter = express.Router();
 
+// Set JSON encoding
+authorRouter.use(express.json());
+
 // POST at root path (of this router)
 // Used to create new authors in the database
 // Request body is validated before being processed

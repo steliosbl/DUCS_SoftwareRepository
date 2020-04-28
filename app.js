@@ -27,9 +27,6 @@ if (process.env.NODE_ENV !== 'test') {
 // Initialize CORS
 app.use(cors());
 
-// Set JSON encoding
-app.use(express.json());
-
 // Initialize paths
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/program', programRouter);

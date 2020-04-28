@@ -13,6 +13,9 @@ const getProgramFrom = require('../middleware/getProgramFrom');
 // Initialize router
 const programRouter = express.Router();
 
+// Set JSON encoding
+programRouter.use(express.json());
+
 // GET at root path (of this router)
 // Request (query) is validated before being processed
 programRouter.get('/', validate.GET, reportValidationErrors, getProgramFrom('query'), (req, res) => {
@@ -36,8 +39,8 @@ programRouter.get('/', validate.GET, reportValidationErrors, getProgramFrom('que
         // Then search for an exact author match
         const authorSearch = req.app.db
             .get('programs')
-            .find({
-                authorId: req.query.q
+            .filter(prog => {
+                return prog.authorId === req.query.q
             });
 
         // Finally, search for a partial title match
