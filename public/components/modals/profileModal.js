@@ -13,7 +13,7 @@ export class ProfileModal extends Modal {
             .withSubmitHandler(this.handleFormSubmission.bind(this));
         this.innerElements = {
             registrationDate: this.element.querySelector('[data-registration-date]'),
-            logoutButton: this.element.querySelector('button[type="logout"]')
+            logoutButton: this.element.querySelector('[data-button-logout]')
         };
         this.withLogoutHandler(e => {
             this.hide();

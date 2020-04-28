@@ -14,9 +14,9 @@ export default class ProgramCard {
             creationDate: this.element.querySelector('[data-card-creation-date]'),
             id: this.element.querySelector('[data-card-id]'),
             image: this.element.querySelector('[data-card-img]'),
-            editButton: this.element.querySelector('button[type="edit"]'),
-            deleteButton: this.element.querySelector('button[type="delete"]'),
-            profileButton: this.element.querySelector('button[type="profile"]')
+            editButton: this.element.querySelector('[data-card-button-edit]'),
+            deleteButton: this.element.querySelector('[data-card-button-delete]'),
+            profileButton: this.element.querySelector('[data-card-button-profile]')
         };
     }
 

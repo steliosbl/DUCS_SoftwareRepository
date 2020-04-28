@@ -51,7 +51,7 @@ programRouter.get('/', validate.GET, reportValidationErrors, getProgramFrom('que
         const titleSearch = req.app.db
             .get('programs')
             .filter(prog => {
-                return prog.title.includes(req.query.q);
+                return prog.title.toLowerCase().includes(req.query.q.toLowerCase());
             });
 
         // Make sure value is always an array even if there is only one match
@@ -66,6 +66,17 @@ programRouter.get('/', validate.GET, reportValidationErrors, getProgramFrom('que
             .value();
     }
 
+    value = value.map(program => {
+        return {
+            author: req.app.db
+                .get('authors')
+                .find({
+                    id: program.authorId
+                }).value(),
+
+            ...program
+        };
+    });
     // Add authors to programs
     value.forEach(program => {
         program.author = req.app.db

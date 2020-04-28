@@ -66,6 +66,7 @@ export class ProgramList {
         this.clearAllCards();
         this.Loading.show();
         dataPromise.then(data => {
+            console.log(data);
             data.forEach(item => this.addCard(item));
         }).finally(() => {
             this.Loading.hide();
