@@ -14,10 +14,11 @@
     <link rel="stylesheet" href="index.css">
 </head>
 
-<body>
-    <nav class="navbar navbar-expand sticky-top navbar-dark">
+<body class='d-flex flex-column min-vh-100'>
+    <nav class="navbar navbar-expand sticky-top navbar-dark align-content-center">
         <a class="navbar-brand" href="/">
-            <img src="assets/placeholder.svg" width="30" height="30" class="d-inline-block align-top text-white" alt="">
+            <img src="assets/logo.svg" width="30" height="30" class="d-inline-block align-top mr-1 text-white" alt="">
+            G.D.P.R. v1.0
         </a>
         <button id="user_button" class="btn btn-primary ml-auto">Welcome <span class="text-dark"
                 data-user-name>Stranger</span></button>
@@ -129,8 +130,8 @@
                         <form class="ml-4 mr-4" id="program_form" novalidate>
                             <div class="form-row mb-4">
                                 <div class="col-7">
-                                    <input type="text" class="form-control form-control-lg" data-input='name'
-                                        placeholder="Enter name..." required>
+                                    <input type="text" class="form-control form-control-lg" data-input='title'
+                                        placeholder="Enter title..." required>
                                     <div class="invalid-feedback">
                                         You really want your program to be called that?
                                     </div>
@@ -153,7 +154,7 @@
                                 <div class="col-12">
                                     <div class="custom-file">
                                         <input type="file" class="custom-file-input" data-input="image">
-                                        <label data-program-image-label class="custom-file-label">Upload image (up to
+                                        <label data-program-image-label class="custom-file-label" name="image">Upload image (up to
                                             1MB)</label>
                                         <div class="invalid-feedback">Invalid file. You must upload only one .png file,
                                             up to 1MB</div>
@@ -245,8 +246,9 @@
             </li>
         </ul>
     </nav>
-    <footer>
-
+    <div class="wrapper flex-grow-1"></div>
+    <footer class="text-white text-center m-1">
+        Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>
     </footer>
     <!-- Bootstrap JS Dependencies -->
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
