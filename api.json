@@ -1,0 +1,992 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0",
+    "title": "Global Digital Program Repository API",
+    "license": {
+      "name": "MIT"
+    }
+  },
+  "servers": [{
+    "url": "http://127.0.0.1:8000"
+  }],
+  "paths": {
+    "/author": {
+      "post": {
+        "summary": "Create a new Author",
+        "operationId": "postAuthor",
+        "parameters": [{
+          "name": "id",
+          "in": "body",
+          "description": "Id of the Author",
+          "schema": {
+            "type": "string",
+            "format": "email"
+          }
+        }, {
+          "name": "name",
+          "in": "body",
+          "description": "Name of the Author",
+          "schema": {
+            "type": "string",
+            "pattern": "/^[a-z ]+$/i",
+            "minLength": 1
+          }
+        }],
+        "responses": {
+          "201": {
+            "description": "Response: Created - Profile of newly POSTed Author",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["id", "name"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "email"
+                    },
+                    "name": {
+                      "type": "string",
+                      "pattern": "/^[a-z ]+$/i",
+                      "minLength": 1
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error: Bad Request - Request body has wrong Content Type (should be application/json)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["errors"],
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Error: Conflict - Attempted to create an Author with an already taken Id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["errors"],
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error: Unprocessable Entity - Request body failed validation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["errors"],
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/author/{id}": {
+      "get": {
+        "summary": "Details about an Author",
+        "operationId": "getAuthor",
+        "parameters": [{
+          "name": "id",
+          "required": true,
+          "in": "path",
+          "description": "Id of the Author",
+          "schema": {
+            "type": "string",
+            "format": "email"
+          }
+        }],
+        "responses": {
+          "200": {
+            "description": "Response: Ok - Author profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["id", "name"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "email"
+                    },
+                    "name": {
+                      "type": "string",
+                      "pattern": "/^[a-z ]+$/i",
+                      "minLength": 1
+                    },
+                    "registrationDate": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error: Not Found - Attempted to view or modify the profile of an Author that doesn't exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["errors"],
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error: Unprocessable Entity - Request path failed validation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["errors"],
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Edit an Author's profile",
+        "operationId": "putAuthor",
+        "parameters": [{
+          "name": "id",
+          "required": true,
+          "in": "path",
+          "description": "Id of the Author",
+          "schema": {
+            "type": "string",
+            "format": "email"
+          }
+        }, {
+          "name": "sessionId",
+          "in": "body",
+          "required": true,
+          "description": "Current SessionId",
+          "schema": {
+            "type": "string",
+            "format": "email"
+          }
+        }, {
+          "name": "name",
+          "in": "body",
+          "description": "Name of the Author",
+          "schema": {
+            "type": "string",
+            "pattern": "/^[a-z ]+$/i",
+            "minLength": 1
+          }
+        }],
+        "responses": {
+          "200": {
+            "description": "Response: Ok - Modified Author profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["id", "name"],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "email"
+                    },
+                    "name": {
+                      "type": "string",
+                      "pattern": "/^[a-z ]+$/i",
+                      "minLength": 1
+                    },
+                    "registrationDate": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error: Bad Request - Request body has wrong Content Type (should be application/json)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["errors"],
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error: Forbidden - Attempted to modify someone else's profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["errors"],
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error: Not Found - Attempted to modify the profile of an Author that doesn't exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["errors"],
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error: Unprocessable Entity - Request body failed validation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["errors"],
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete an Author's profile",
+        "operationId": "deleteAuthor",
+        "parameters": [{
+          "name": "id",
+          "required": true,
+          "in": "path",
+          "description": "Id of the Author",
+          "schema": {
+            "type": "string",
+            "format": "email"
+          }
+        }],
+        "responses": {
+          "403": {
+            "description": "Error: Forbidden - Deleting profiles is not allowed. Would you delete a person off the street?",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["errors"],
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/program": {
+      "get": {
+        "summary": "Get one or more program objects",
+        "operationId": "getProgram",
+        "parameters": [{
+          "name": "id",
+          "in": "query",
+          "description": "Exact Id of the program",
+          "schema": {
+            "type": "string",
+            "pattern": "/^[a-zA-Z0-9_-]*$/i",
+            "minLength": 21,
+            "maxLength": 21
+          },
+          "required": false
+        }, {
+          "name": "q",
+          "in": "query",
+          "description": "Search query",
+          "schema": {
+            "type": "string"
+          },
+          "required": false
+        }, {
+          "name": "start",
+          "in": "query",
+          "description": "Start index of paginated search (zero-based)",
+          "schema": {
+            "type": "integer",
+            "minimum": 0,
+            "default": 0
+          },
+          "required": false
+        }, {
+          "name": "stop",
+          "in": "query",
+          "description": "Stop index of paginated search (non-inclusive)",
+          "schema": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "required": false
+        }],
+        "responses": {
+          "200": {
+            "description": "Response: Ok - Search results (in an array)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "pattern": "/^[a-zA-Z0-9_-]*$/i",
+                        "minLength": 21,
+                        "maxLength": 21
+                      },
+                      "title": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 69
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "authorId": {
+                        "type": "string",
+                        "format": "email"
+                      },
+                      "author": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "email"
+                          },
+                          "name": {
+                            "type": "string",
+                            "pattern": "/^[a-z ]+$/i",
+                            "minLength": 1
+                          },
+
+                          "registrationDate": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      },
+                      "creationDate": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "modificationDate": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error: Not Found - No matching programs found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "minItems": 0,
+                  "maxItems": 0
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error: Unprocessable Entity - Query failed validation (when using Id parameter)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["errors"],
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new Program",
+        "operationId": "postProgram",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["sessionId", "title", "description"],
+                "properties": {
+                  "authorId": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 69
+                  },
+                  "description": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Response: Created - New program object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "/^[a-zA-Z0-9_-]*$/i",
+                      "minLength": 21,
+                      "maxLength": 21
+                    },
+                    "title": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 69
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "creationDate": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "modificationDate": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error: Bad Request - Request body has wrong Content Type (should be application/json)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["errors"],
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error: Unprocessable Entity - Request body failed validation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["errors"],
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "424": {
+            "description": "Error: Failed Dependency - Author with the given Id could not be found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["errors"],
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Edit an existing Program",
+        "operationId": "putProgram",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["sessionId"],
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 69
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "sessionId": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "authorId": {
+                    "type": "string",
+                    "format": "email"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Response: Ok - Edited program object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "/^[a-zA-Z0-9_-]*$/i",
+                      "minLength": 21,
+                      "maxLength": 21
+                    },
+                    "title": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 69
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "creationDate": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "modificationDate": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error: Bad Request - Request body has wrong Content Type (should be application/json)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["errors"],
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error: Forbidden - SessionId provided does not match the Program owner Id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["errors"],
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error: Unprocessable Entity - Request body failed validation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["errors"],
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Edit an existing Program",
+        "operationId": "putProgram",
+        "parameters": [{
+          "name": "id",
+          "in": "query",
+          "description": "Exact Id of the program",
+          "schema": {
+            "type": "string",
+            "pattern": "/^[a-zA-Z0-9_-]*$/i",
+            "minLength": 21,
+            "maxLength": 21
+          },
+          "required": true
+        }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "required": ["sessionId"],
+                "type": "object",
+                "properties": {
+                  "sessionId": {
+                    "type": "string",
+                    "format": "email"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Response: Ok - The program has been deleted"
+          },
+          "400": {
+            "description": "Error: Bad Request - Request body has wrong Content Type (should be application/json)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["errors"],
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error: Forbidden - SessionId provided does not match the Program owner Id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["errors"],
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error: Unprocessable Entity - Request body failed validation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["errors"],
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/image/{id}": {
+      "get": {
+        "summary": "Program image or placeholder",
+        "operationId": "getImage",
+        "parameters": [{
+          "name": "id",
+          "in": "path",
+          "description": "Id of the program",
+          "schema": {
+            "type": "string",
+            "pattern": "/^[a-zA-Z0-9_-]*$/i",
+            "minLength": 21,
+            "maxLength": 21
+          }
+        }],
+        "responses": {
+          "200": {
+            "description": "Response: Ok - The uploaded Program image or, if one does not exist, the placeholder",
+            "content": {
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/svg": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Upload a new Program image (old one will be overwritten)",
+        "operationId": "postImage",
+        "parameters": [{
+          "name": "id",
+          "required": true,
+          "in": "path",
+          "description": "Id of the program",
+          "schema": {
+            "type": "string",
+            "pattern": "/^[a-zA-Z0-9_-]*$/i",
+            "minLength": 21,
+            "maxLength": 21
+          }
+        }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": ["image"],
+                "type": "object",
+                "properties": {
+                  "image": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Response: Ok - Image uploaded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error: Bad Request - Request body has wrong Content Type (should be multipart/form-data)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["errors"],
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Error: Request Too Long - Image was over the file size limit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["errors"],
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Error: Unprocessable Entity - Request body failed validation or Image was of the wrong file type or No Image was uploaded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["errors"],
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
